@@ -1,0 +1,16 @@
+@media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #ticket, #ticket * {
+                visibility: visible;
+            }
+
+            #ticket {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+            }
+         } 
