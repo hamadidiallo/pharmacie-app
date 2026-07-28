@@ -2,37 +2,44 @@
 
 @section('titre', 'Stock faible — GESTA PHARM')
 
+@section('topbar')
+    <div class="text-base font-bold">Stock faible</div>
+    <span class="ml-3.5 text-[13px] text-faint">Il reste 5 unités ou moins</span>
+    <a href="{{ route('medicaments.index', ['filtre' => 'faible']) }}" class="btn-ghost ml-auto">
+        Voir dans les médicaments
+    </a>
+@endsection
+
 @section('content')
 
-    <section class="card-officine overflow-hidden">
-
-        <div class="card-head">
-            <div>
-                <h1 class="card-title">Stock faible</h1>
-                <p class="mt-0.5 text-sm text-ink-soft">Il reste 5 unités ou moins.</p>
-            </div>
-            <span class="badge-faible">{{ $stockFaible->count() }}</span>
-        </div>
+    <div class="panel overflow-hidden">
 
         <div class="overflow-x-auto">
-            <table class="table-officine">
+            <table class="table-data">
 
                 <thead>
                     <tr>
-                        <th>Produit</th>
-                        <th class="text-right">Stock restant</th>
+                        <th>MÉDICAMENT</th>
+                        <th>EXPIRATION</th>
+                        <th class="text-right">STOCK RESTANT</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     @forelse ($stockFaible as $medicament)
                         <tr>
-                            <td class="font-medium">{{ $medicament->nom }}</td>
-                            <td class="num"><span class="badge-faible">{{ $medicament->stock }}</span></td>
+                            <td>
+                                <div class="font-semibold">{{ $medicament->nom }}</div>
+                                <div class="truncate text-xs text-faint">{{ $medicament->description }}</div>
+                            </td>
+                            <td class="num text-slate-ink">{{ $medicament->date_expiration->format('m / Y') }}</td>
+                            <td class="text-right">
+                                <span class="pill-warn num">{{ $medicament->stock }}</span>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="2" class="py-10 text-center text-ink-soft">
+                            <td colspan="3" class="py-12 text-center text-muted">
                                 Aucun produit en stock faible.
                             </td>
                         </tr>
@@ -42,6 +49,6 @@
             </table>
         </div>
 
-    </section>
+    </div>
 
 @endsection

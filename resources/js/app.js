@@ -36,13 +36,28 @@ document.addEventListener('click', (event) => {
     }
 });
 
-// --- Menu mobile --------------------------------------------------------
+// --- Barre latérale sur mobile ------------------------------------------
 const bascule = document.querySelector('[data-menu-toggle]');
-const menu = document.getElementById('menu-principal');
+const sidebar = document.getElementById('sidebar');
+const voile = document.querySelector('[data-menu-backdrop]');
 
-bascule?.addEventListener('click', () => {
+function basculerMenu(ouvrir) {
+    sidebar.classList.toggle('-translate-x-full', !ouvrir);
+    voile.classList.toggle('hidden', !ouvrir);
+    bascule.setAttribute('aria-expanded', String(ouvrir));
+}
 
-    const ouvert = menu.classList.toggle('hidden') === false;
+if (bascule && sidebar && voile) {
 
-    bascule.setAttribute('aria-expanded', String(ouvert));
-});
+    bascule.addEventListener('click', () => {
+        basculerMenu(sidebar.classList.contains('-translate-x-full'));
+    });
+
+    voile.addEventListener('click', () => basculerMenu(false));
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !voile.classList.contains('hidden')) {
+            basculerMenu(false);
+        }
+    });
+}

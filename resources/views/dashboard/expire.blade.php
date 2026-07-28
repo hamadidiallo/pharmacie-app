@@ -2,43 +2,48 @@
 
 @section('titre', 'Expirations proches — GESTA PHARM')
 
+@section('topbar')
+    <div class="text-base font-bold">Expiration proche</div>
+    <span class="ml-3.5 text-[13px] text-faint">Produits périmant dans les 30 prochains jours</span>
+    <a href="{{ route('medicaments.index', ['filtre' => 'expire']) }}" class="btn-ghost ml-auto">
+        Voir dans les médicaments
+    </a>
+@endsection
+
 @section('content')
 
-    <section class="card-officine overflow-hidden">
-
-        <div class="card-head">
-            <div>
-                <h1 class="card-title">Expiration proche</h1>
-                <p class="mt-0.5 text-sm text-ink-soft">Produits périmant dans les 30 prochains jours.</p>
-            </div>
-            <span class="badge-faible">{{ $expires->count() }}</span>
-        </div>
+    <div class="panel overflow-hidden">
 
         <div class="overflow-x-auto">
-            <table class="table-officine">
+            <table class="table-data">
 
                 <thead>
                     <tr>
-                        <th>Produit</th>
-                        <th class="text-right">Date d'expiration</th>
-                        <th class="text-right">Reste</th>
+                        <th>MÉDICAMENT</th>
+                        <th>STOCK</th>
+                        <th>EXPIRATION</th>
+                        <th class="text-right">RESTE</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     @forelse ($expires as $medicament)
                         <tr>
-                            <td class="font-medium">{{ $medicament->nom }}</td>
-                            <td class="num">{{ $medicament->date_expiration->format('d/m/Y') }}</td>
-                            <td class="num">
-                                <span class="badge-faible">
+                            <td>
+                                <div class="font-semibold">{{ $medicament->nom }}</div>
+                                <div class="truncate text-xs text-faint">{{ $medicament->description }}</div>
+                            </td>
+                            <td class="num">{{ $medicament->stock }}</td>
+                            <td class="num text-danger-fg">{{ $medicament->date_expiration->format('d / m / Y') }}</td>
+                            <td class="text-right">
+                                <span class="pill-warn num">
                                     {{ (int) now()->startOfDay()->diffInDays($medicament->date_expiration, false) }} j
                                 </span>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="py-10 text-center text-ink-soft">
+                            <td colspan="4" class="py-12 text-center text-muted">
                                 Aucun produit n'expire dans les 30 prochains jours.
                             </td>
                         </tr>
@@ -48,6 +53,6 @@
             </table>
         </div>
 
-    </section>
+    </div>
 
 @endsection

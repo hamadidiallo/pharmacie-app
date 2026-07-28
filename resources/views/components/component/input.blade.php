@@ -1,3 +1,5 @@
+@php $enErreur = $errors->has($name); @endphp
+
 <div class="mb-4">
 
     @if ($label !== '')
@@ -5,11 +7,15 @@
     @endif
 
     @if ($type === 'textarea')
-        <textarea id="{{ $name }}" name="{{ $name }}" rows="3"
-            @class(['field-input', 'border-rouge-700' => $errors->has($name)])>{{ $value }}</textarea>
+        <textarea id="{{ $name }}" name="{{ $name }}" rows="3" placeholder="{{ $placeholder }}"
+            @class(['field-textarea', 'border-danger-fg' => $enErreur])>{{ $value }}</textarea>
     @else
         <input type="{{ $type }}" id="{{ $name }}" name="{{ $name }}" value="{{ $value }}"
-            @class(['field-input', 'border-rouge-700' => $errors->has($name)])>
+            placeholder="{{ $placeholder }}" @class(['field-input', 'border-danger-fg' => $enErreur])>
+    @endif
+
+    @if ($hint !== '' && !$enErreur)
+        <p class="mt-1.5 text-xs text-faint">{{ $hint }}</p>
     @endif
 
     @error($name)

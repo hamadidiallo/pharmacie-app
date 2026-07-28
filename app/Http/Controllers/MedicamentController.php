@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreMedicamentRequest;
 use App\Models\Medicament;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MedicamentController extends Controller
@@ -11,10 +12,35 @@ class MedicamentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $medicaments = Medicament::orderByDesc('created_at')->paginate(10);
-        return view('medicaments.index', compact('medicaments'));
+        $filtre = in_array($request->query('filtre'), ['stock', 'faible', 'rupture', 'expire'], true)
+            ? $request->query('filtre')
+            : 'tous';
+
+        $recherche = trim((string) $request->query('q'));
+
+        $medicaments = Medicament::query()
+            ->when($recherche !== '', fn ($requete) => $requete->where('nom', 'LIKE', '%' . $recherche . '%'))
+            ->when($filtre === 'stock', fn ($requete) => $requete->where('stock', '>', 5))
+            ->when($filtre === 'faible', fn ($requete) => $requete->where('stock', '>', 0)->where('stock', '<=', 5))
+            ->when($filtre === 'rupture', fn ($requete) => $requete->where('stock', 0))
+            ->when($filtre === 'expire', fn ($requete) => $requete->whereBetween('date_expiration', [now(), now()->addDays(30)]))
+            ->orderByDesc('created_at')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('medicaments.index', [
+            'medicaments' => $medicaments,
+            'filtre' => $filtre,
+            'recherche' => $recherche,
+            'compteurs' => [
+                'tous' => Medicament::count(),
+                'faible' => Medicament::where('stock', '>', 0)->where('stock', '<=', 5)->count(),
+                'rupture' => Medicament::where('stock', 0)->count(),
+                'expire' => Medicament::whereBetween('date_expiration', [now(), now()->addDays(30)])->count(),
+            ],
+        ]);
     }
 
     /**

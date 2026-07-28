@@ -1,7 +1,9 @@
 @session('alert')
-    <div class="notice-info mb-6" role="status">
-        <svg viewBox="0 0 24 24" class="mt-0.5 size-4 shrink-0 fill-current" aria-hidden="true">
-            <path d="M9.5 3h5v6.5H21v5h-6.5V21h-5v-6.5H3v-5h6.5V3Z" />
+    <div class="notice-info mb-4" role="status">
+        <svg class="mt-px size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="m8.5 12 2.5 2.5 4.5-5" />
         </svg>
         <span>{{ session('alert') }}</span>
     </div>

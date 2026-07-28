@@ -15,9 +15,10 @@ class Input extends Component
         public string $name,
         public string $type = 'text',
         public string $value = '',
-        public string $label = ''
-    )
-    {
+        public string $label = '',
+        public string $placeholder = '',
+        public string $hint = ''
+    ) {
         //
     }
 

@@ -6,194 +6,245 @@
 @source '../**/*.js';
 
 /*
- * GESTA PHARM — langage visuel
- *
- * Deux matériaux du métier : le papier d'ordonnance et le ticket de caisse.
- * Le vert officine est celui de la croix de pharmacie. Les chiffres sont en
- * monospace tabulaire pour s'aligner en colonnes et se lire d'un coup d'œil
- * au comptoir. Les filets pointillés reprennent le trait des reçus thermiques.
+ * GESTA PHARM — design tokens
+ * Palette santé (vert), thème clair, ton clinique.
+ * Voir « Tableau de bord pharmacie/ecrans-tailwind/tokens ».
  */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
-    --font-mono: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
+    --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
 
-    --color-paper: #f4f6f4;
-    --color-surface: #ffffff;
-    --color-ink: #10221a;
-    --color-ink-soft: #5b6b62;
-    --color-rule: #dde4de;
+    /* Vert santé */
+    --color-brand-50: #e7f5f0;
+    --color-brand-500: #0f8a6b;
+    --color-brand-600: #0b6b52;
+    --color-brand-900: #0c2a22;
+    --color-leaf: #16a37d;
+    --color-mint: #3ebe9a;
 
-    --color-officine-50: #e9f3ed;
-    --color-officine-100: #cfe6da;
-    --color-officine-500: #0f7a4f;
-    --color-officine-600: #0c6341;
-    --color-officine-700: #08402b;
+    /* Surfaces / neutres */
+    --color-canvas: #ebf0ee;
+    --color-surface: #f4f7f6;
+    --color-line: #e2eae7;
+    --color-hairline: #eef2f0;
+    --color-ink: #16241f;
+    --color-muted: #7c8a85;
+    --color-faint: #9aa6a2;
+    --color-slate-ink: #3a4a44;
 
-    --color-ambre-50: #fbf2e3;
-    --color-ambre-100: #f4e2c4;
-    --color-ambre-700: #96560b;
+    /* Sidebar */
+    --color-sidebar-text: #cfe3dc;
+    --color-sidebar-muted: #6fa394;
+    --color-sidebar-label: #5c8577;
+    --color-sidebar-card: #123a30;
 
-    --color-rouge-50: #fbedec;
-    --color-rouge-100: #f5d6d3;
-    --color-rouge-700: #8f261e;
+    /* Statuts */
+    --color-danger-bg: #fcecea;
+    --color-danger-border: #f3cfc9;
+    --color-danger-fg: #c1352b;
+    --color-danger-text: #7a241c;
+    --color-warning-bg: #fdf3e0;
+    --color-warning-border: #f1ddb4;
+    --color-warning-fg: #b47500;
+    --color-warning-text: #8a5a00;
+    --color-success-bg: #e7f5f0;
+    --color-success-fg: #0b6b52;
+
+    /* Rayons */
+    --radius-card: 13px;
+    --radius-field: 11px;
+    --radius-pill: 20px;
+
+    /* Ombres */
+    --shadow-card: 0 10px 30px -18px rgb(11 54 42 / 0.28);
+
+    /* Layout */
+    --spacing-sidebar: 236px;
+    --spacing-topbar: 64px;
 }
 
 @layer base {
-    html {
-        background-color: var(--color-paper);
-    }
-
     body {
+        background-color: var(--color-canvas);
         color: var(--color-ink);
         -webkit-font-smoothing: antialiased;
     }
 
     :focus-visible {
-        outline: 2px solid var(--color-officine-500);
+        outline: 2px solid var(--color-brand-500);
         outline-offset: 2px;
     }
 }
 
+/* ---- chiffres alignés (montants, quantités) ---- */
+
+@utility num {
+    font-family: var(--font-mono);
+    font-feature-settings: 'tnum';
+    letter-spacing: -0.01em;
+}
+
 /* ---- surfaces ---- */
 
-@utility card-officine {
-    @apply bg-surface border border-rule rounded-lg;
+@utility panel {
+    @apply rounded-card border border-line bg-white;
 }
 
-@utility card-head {
-    @apply flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-rule;
+@utility panel-head {
+    @apply flex flex-wrap items-center justify-between gap-3 border-b border-hairline px-[18px] py-3.5;
 }
 
-@utility card-title {
-    @apply text-base font-semibold tracking-tight;
-}
-
-/* Filet pointillé du ticket de caisse, repris dans toute l'application. */
-@utility rule-dashed {
-    @apply border-t border-dashed border-rule;
-}
-
-/* ---- chiffres ---- */
-
-@utility figure {
-    @apply font-mono tabular-nums tracking-tight;
+@utility panel-title {
+    @apply text-sm font-bold;
 }
 
 /* ---- boutons ---- */
 
 @utility btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2
-           text-sm font-semibold whitespace-nowrap
-           transition-colors duration-150
-           disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex h-9 items-center justify-center gap-2 rounded-field px-4
+           text-[13px] font-semibold whitespace-nowrap transition-colors
+           disabled:pointer-events-none disabled:opacity-50;
 }
 
 @utility btn-primary {
-    @apply btn bg-officine-500 text-white hover:bg-officine-600;
+    @apply btn bg-brand-500 text-white hover:bg-brand-600;
 }
 
 @utility btn-ghost {
-    @apply btn border border-rule bg-surface text-ink hover:bg-officine-50 hover:border-officine-100;
+    @apply btn border border-line bg-white text-slate-ink hover:bg-surface;
 }
 
 @utility btn-danger {
-    @apply btn bg-rouge-700 text-white hover:bg-rouge-700/90;
+    @apply btn border border-danger-border bg-danger-bg text-danger-fg hover:bg-danger-border;
 }
 
-@utility btn-sm {
-    @apply px-3 py-1.5 text-xs;
+@utility btn-lg {
+    @apply h-12 rounded-field px-5 text-[15px] font-bold;
+}
+
+/* Bouton carré à icône seule des tableaux. */
+@utility btn-icon {
+    @apply grid size-8 shrink-0 place-items-center rounded-lg border border-line
+           bg-white transition-colors hover:bg-surface;
+}
+
+@utility btn-icon-danger {
+    @apply btn-icon border-danger-border bg-danger-bg hover:bg-danger-border;
 }
 
 /* ---- formulaires ---- */
 
 @utility field-label {
-    @apply block mb-1.5 text-sm font-medium text-ink-soft;
+    @apply mb-1.5 block text-[13px] font-semibold;
 }
 
 @utility field-input {
-    @apply block w-full rounded-md border border-rule bg-surface
-           px-3 py-2 text-sm text-ink
-           placeholder:text-ink-soft/60
-           focus:border-officine-500 focus:outline-none focus:ring-2 focus:ring-officine-500/20;
+    @apply block h-11 w-full rounded-field border border-line bg-surface px-3.5
+           text-sm text-ink placeholder:text-faint
+           focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/15;
+}
+
+@utility field-textarea {
+    @apply block w-full rounded-field border border-line bg-surface px-3.5 py-2.5
+           text-sm text-ink placeholder:text-faint
+           focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/15;
 }
 
 @utility field-error {
-    @apply mt-1.5 text-sm text-rouge-700;
+    @apply mt-1.5 text-[13px] text-danger-fg;
 }
 
 /* ---- tableaux ---- */
 
-@utility table-officine {
-    @apply w-full text-sm border-collapse;
+@utility table-data {
+    @apply w-full border-collapse text-[13px];
+
+    & thead tr {
+        @apply bg-[#F7FAF9] text-left text-muted;
+    }
 
     & thead th {
-        @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider
-               text-ink-soft border-b border-rule whitespace-nowrap;
+        @apply px-3 py-3.5 font-semibold first:px-[18px];
+    }
+
+    & tbody tr {
+        @apply border-t border-hairline hover:bg-[#F2F9F6];
     }
 
     & tbody td {
-        @apply px-4 py-3 border-b border-dashed border-rule align-middle;
-    }
-
-    & tbody tr:hover td {
-        @apply bg-officine-50/50;
-    }
-
-    & .num {
-        @apply text-right font-mono tabular-nums;
+        @apply px-3 py-3.5 first:px-[18px];
     }
 }
 
-/* ---- badges d'état ---- */
+/* ---- pastilles ---- */
 
-@utility badge {
-    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5
-           text-xs font-semibold font-mono tabular-nums;
+@utility pill {
+    @apply inline-flex items-center rounded-pill px-2.5 py-[3px] text-xs font-semibold;
 }
 
-@utility badge-ok {
-    @apply badge bg-officine-50 text-officine-700;
+@utility pill-ok {
+    @apply pill bg-success-bg text-success-fg;
 }
 
-@utility badge-faible {
-    @apply badge bg-ambre-50 text-ambre-700;
+@utility pill-warn {
+    @apply pill bg-warning-bg text-warning-text;
 }
 
-@utility badge-rupture {
-    @apply badge bg-rouge-50 text-rouge-700;
+@utility pill-danger {
+    @apply pill bg-danger-bg text-danger-fg;
+}
+
+/* Onglets de filtre de la liste des médicaments. */
+@utility filter-tab {
+    @apply rounded-pill border border-line bg-white px-3.5 py-1.5 text-[13px]
+           text-slate-ink transition-colors hover:bg-surface;
+}
+
+@utility filter-tab-active {
+    @apply filter-tab border-brand-900 bg-brand-900 font-semibold text-white hover:bg-brand-900;
 }
 
 /* ---- messages ---- */
 
 @utility notice {
-    @apply flex items-start gap-3 rounded-md border px-4 py-3 text-sm;
+    @apply flex items-start gap-3 rounded-field border px-4 py-3 text-[13px];
 }
 
 @utility notice-info {
-    @apply notice bg-officine-50 border-officine-100 text-officine-700;
+    @apply notice border-brand-50 bg-brand-50 text-brand-600;
 }
 
 @utility notice-warn {
-    @apply notice bg-ambre-50 border-ambre-100 text-ambre-700;
+    @apply notice border-warning-border bg-warning-bg text-warning-text;
 }
 
 @utility notice-error {
-    @apply notice bg-rouge-50 border-rouge-100 text-rouge-700;
+    @apply notice border-danger-border bg-danger-bg text-danger-text;
+}
+
+/* ---- navigation latérale ---- */
+
+@utility nav-link {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-sidebar-text
+           transition-colors hover:bg-white/10;
+}
+
+@utility nav-link-active {
+    @apply nav-link bg-leaf font-semibold text-white hover:bg-leaf;
 }
 
 /* ---- boîtes de dialogue natives ---- */
 
-@utility dialog-officine {
-    @apply w-[min(30rem,calc(100vw-2rem))] rounded-lg border border-rule bg-surface p-0 text-ink;
+@utility dialog-panel {
+    @apply w-[min(30rem,calc(100vw-2rem))] rounded-card border border-line bg-white p-0 text-ink;
 }
 
 dialog::backdrop {
-    background-color: rgb(16 34 26 / 0.5);
+    background-color: rgb(12 42 34 / 0.55);
 }
 
-/*
- * Le ticket : reproduction d'un reçu thermique 80 mm, bords dentelés compris.
- */
+/* ---- ticket 80 mm ---- */
+
 .ticket {
     width: 80mm;
     max-width: 100%;
@@ -201,7 +252,7 @@ dialog::backdrop {
 
 .ticket-edge {
     height: 8px;
-    background-image: radial-gradient(circle at 6px 6px, transparent 6px, var(--color-surface) 6.5px);
+    background-image: radial-gradient(circle at 6px 6px, transparent 6px, #fff 6.5px);
     background-size: 12px 12px;
     background-repeat: repeat-x;
 }
@@ -220,9 +271,8 @@ dialog::backdrop {
     }
 }
 
-/*
- * Impression : seul le ticket sort de l'imprimante, au format 80 mm.
- */
+/* ---- impression : seul le ticket sort de l'imprimante ---- */
+
 @media print {
     @page {
         size: 80mm auto;

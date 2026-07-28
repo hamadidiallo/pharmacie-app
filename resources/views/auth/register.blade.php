@@ -1,46 +1,35 @@
-@extends('layout')
+@extends('layout-auth')
 
 @section('titre', 'Créer un compte — GESTA PHARM')
 
 @section('content')
-    <div class="mx-auto max-w-sm py-8">
 
-        <div class="mb-8">
-            <p class="mb-2 font-mono text-xs uppercase tracking-widest text-officine-600">Officine</p>
-            <h1 class="text-2xl font-bold tracking-tight">CRÉER UN COMPTE</h1>
-            <p class="mt-1 text-sm text-ink-soft">Un compte par personne travaillant au comptoir.</p>
+    <h1 class="mb-1.5 text-[26px] font-bold tracking-tight">Créer un compte</h1>
+    <p class="mb-8 text-sm text-muted">Un compte par personne travaillant au comptoir</p>
+
+    <form action="{{ route('auth.register') }}" method="post">
+
+        @csrf
+
+        <div class="grid gap-x-4 sm:grid-cols-2">
+            <x-component.input name="firstname" value="{{ old('firstname') }}" label="Prénom" />
+            <x-component.input name="lastname" value="{{ old('lastname') }}" label="Nom" />
         </div>
 
-        <div class="card-officine p-6">
+        <x-component.input name="email" type="email" value="{{ old('email') }}" label="Adresse e-mail"
+            placeholder="pharmacien@gestapharm.ml" />
 
-            <form action="{{ route('auth.register') }}" method="post">
+        <x-component.input name="password" type="password" label="Mot de passe" placeholder="8 caractères minimum" />
 
-                @csrf
+        <button class="btn-primary btn-lg mt-2 w-full">Créer le compte</button>
 
-                <div class="grid gap-x-4 sm:grid-cols-2">
-                    <x-component.input name="firstname" value="{{ old('firstname') }}" label="Prénom" />
-                    <x-component.input name="lastname" value="{{ old('lastname') }}" label="Nom" />
-                </div>
+    </form>
 
-                <x-component.input name="email" type="email" value="{{ old('email') }}" label="Email" />
+    <p class="mt-5 text-center text-[13px] text-muted">
+        Vous avez déjà un compte ?
+        <a href="{{ route('auth.login') }}" class="font-semibold text-brand-500 hover:text-brand-600">
+            Se connecter
+        </a>
+    </p>
 
-                <x-component.input name="password" type="password" label="Mot de passe" />
-
-                <p class="-mt-2 mb-4 text-xs text-ink-soft">8 caractères minimum.</p>
-
-                <button class="btn-primary w-full">Créer le compte</button>
-
-            </form>
-
-        </div>
-
-        <p class="mt-6 text-center text-sm text-ink-soft">
-            Vous avez déjà un compte ?
-            <a href="{{ route('auth.login') }}"
-                class="font-semibold text-officine-600 underline underline-offset-4 hover:text-officine-700">
-                Se connecter
-            </a>
-        </p>
-
-    </div>
 @endsection

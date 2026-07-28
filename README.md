@@ -50,38 +50,55 @@ php artisan test
 - **Médicaments** — création, modification, suppression. Un produit identique
   (même nom, prix, description et date d'expiration) voit son stock cumulé au
   lot existant plutôt que dupliqué.
-- **Ventes** — recherche de produits, panier, contrôle du stock, encaissement.
-  L'enregistrement est transactionnel : si un seul article manque, rien n'est
-  écrit. Les prix sont toujours relus en base, jamais acceptés depuis le client.
-  Supprimer une vente restitue les quantités au stock.
+- **Ventes** — recherche de produits, panier, contrôle du stock. Le panier passe
+  par la session : les prix sont toujours relus en base, jamais acceptés depuis
+  le client. L'enregistrement est transactionnel — si un seul article manque,
+  rien n'est écrit. Supprimer une vente restitue les quantités au stock.
+- **Encaissement** — espèces, Mobile Money ou carte. En espèces, le montant reçu
+  et la monnaie à rendre sont calculés puis conservés sur la vente et imprimés
+  sur le ticket. Un montant reçu inférieur au total est refusé.
 - **Tickets** — affichage au format 80 mm, impression directe et export PDF.
-- **Tableau de bord** — recette du jour, semaine, mois et trimestre, ruptures,
-  stocks faibles, expirations sous 30 jours, top 5 des produits.
+- **Tableau de bord** — recette du jour (avec écart vs la veille), semaine et
+  mois, graphe du CA sur 7 jours, alertes de stock détaillées.
+- **Statistiques** — top 5 des produits par période (semaine, mois, trimestre),
+  panier moyen, nombre de tickets, surveillance du stock.
 
 ## Interface
 
-Le thème s'appuie sur deux matériaux du métier : le papier d'ordonnance et le
-ticket de caisse. Le vert `officine` est celui de la croix des pharmacies. Les
-chiffres sont composés en monospace tabulaire pour s'aligner en colonnes, et les
-filets pointillés reprennent le trait des reçus thermiques.
+Le design suit les tokens fournis dans
+`Tableau de bord pharmacie/ecrans-tailwind/tokens` : palette santé (vert
+officine), thème clair, ton clinique, barre latérale sombre de 236 px et topbar
+de 64 px. IBM Plex Sans pour l'interface, IBM Plex Mono en chiffres tabulaires
+pour tous les montants et quantités.
 
-Les jetons de design (couleurs, polices) sont déclarés dans le bloc `@theme` de
-[`resources/css/app.css`](resources/css/app.css), et les classes composées
-(`btn-primary`, `card-officine`, `table-officine`, `badge-*`, `notice-*`) juste
-en dessous via `@utility`.
+Les jetons (couleurs, polices, rayons, ombre) sont déclarés dans le bloc
+`@theme` de [`resources/css/app.css`](resources/css/app.css), et les classes
+composées (`panel`, `btn-primary`, `table-data`, `pill-*`, `notice-*`,
+`nav-link`) juste en dessous via `@utility`.
 
 Les boîtes de dialogue utilisent l'élément natif `<dialog>` piloté par
 [`resources/js/app.js`](resources/js/app.js) — aucune dépendance JavaScript
-externe.
+externe, aucun CDN.
 
 ## Structure
 
 ```
 app/Http/Controllers/   Auth, Dashboard, Medicament, Vente
 app/Exceptions/         VenteException (erreurs métier de l'encaissement)
-resources/views/        layout, app/menu, auth, dashboard, medicaments, ventes
-resources/js/           app.js (dialogues, menu), ventes/vente.js (panier)
+resources/views/        layout (app), layout-auth (invité), app/menu (sidebar),
+                        auth, dashboard, medicaments, ventes
+resources/js/           app.js (dialogues, sidebar), ventes/vente.js (panier)
 tests/Feature/          Auth, Medicament, Vente, Pages
+```
+
+### Parcours d'une vente
+
+```
+ventes.create   panier construit côté client
+      ↓         POST ventes.panier — contrôle du stock, panier stocké en session
+ventes.paiement récapitulatif au prix de la base, choix du mode de paiement
+      ↓         POST ventes.store — transaction, décrément du stock
+ventes.show     ticket 80 mm, impression et PDF
 ```
 
 ## Support

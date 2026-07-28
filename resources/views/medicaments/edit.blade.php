@@ -17,7 +17,7 @@
     <x-component.input name="description" type="textarea" value="{{ $medicament->description }}"
         label="Description" />
 
-    <div class="flex justify-end gap-2">
+    <div class="mt-2 flex justify-end gap-2">
         <button type="button" data-dialog-close class="btn-ghost">Annuler</button>
         <button type="submit" class="btn-primary">Enregistrer</button>
     </div>

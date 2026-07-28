@@ -72,8 +72,17 @@
     </table>
 
     <p class="total">
-        TOTAL : {{ $vente->total }} FCFA
+        TOTAL : {{ number_format($vente->total, 0, ',', ' ') }} FCFA
     </p>
+
+    <p><strong>Paiement :</strong> {{ $vente->libelleModePaiement() }}</p>
+
+    @if ($vente->montant_recu !== null)
+        <p>
+            Reçu : {{ number_format($vente->montant_recu, 0, ',', ' ') }} FCFA ·
+            Rendu : {{ number_format($vente->monnaie_rendue, 0, ',', ' ') }} FCFA
+        </p>
+    @endif
 
     <hr>
 
