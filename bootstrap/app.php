@@ -11,7 +11,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // la route de connexion s'appelle "auth.login" et non "login"
+        $middleware->redirectGuestsTo(fn () => route('auth.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -1,154 +1,133 @@
 @extends('layout')
 
+@section('titre', 'Ventes — GESTA PHARM')
+
 @section('content')
-    <nav>@include('app.menu')</nav>
 
-    <div class="container mt-4">
+    <section class="card-officine overflow-hidden">
 
-        <div class="card shadow">
-
-            <div class="card-header">
-                <h3>Liste des ventes</h3>
+        <div class="card-head">
+            <div>
+                <h1 class="card-title">Historique des ventes</h1>
+                <p class="mt-0.5 text-sm text-ink-soft">{{ $ventes->total() }} tickets enregistrés.</p>
             </div>
-            {{-- INPUT RECHERCHE ID TICKET --}}
-            <div class="row mb-3">
-
-                <div class="col-md-4">
-
-                    <input type="text" id="searchTicket" class="form-control" placeholder="🔍 Rechercher par ticket ID">
-
-                </div>
-
+            <div class="flex items-center gap-2">
+                <label for="searchTicket" class="sr-only">Rechercher un ticket</label>
+                <input type="search" id="searchTicket" class="field-input w-52" placeholder="N° de ticket">
+                <a href="{{ route('ventes.create') }}" class="btn-primary btn-sm">Nouvelle vente</a>
             </div>
-            <div id="noResult" class="alert alert-danger mt-2" style="display: none;">
-
-                ❌ Aucun ticket trouvé
-
-            </div>
-
-            <div class="card-body">
-
-                <table class="table table-bordered text-center">
-
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Total</th>
-                            <th>Date</th>
-                            <th>HEURE</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @foreach ($ventes as $vente)
-                            <tr class="vente-row">
-                                <td>{{ $vente->id }}</td>
-                                <td>{{ $vente->total }} FCFA</td>
-                                <td>{{ $vente->date_vente }}</td>
-                                <td>{{ $vente->created_at->format('H:m:i') }}</td>
-                                <td>
-                                    <a href="{{ route('ventes.show', $vente->id) }}" class="btn btn-outline-primary btn-sm">
-                                        Voir ticket
-                                    </a>
-                                </td>
-                                <td>
-                                <td class="d-flex gap-2 justify-content-center">
-                                    <!-- Button trigger modal -->
-                                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
-                                        data-bs-target="#delete{{ $vente->id }}">
-                                        SUPPRIMER TICKET
-                                    </button>
-
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="delete{{ $vente->id }}" tabindex="-1"
-                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">SUPPRESSION
-                                                        VENTE</h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    VOULEZ-VOUS SUPPRIMER CETTE VENTE ?
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary"
-                                                        data-bs-dismiss="modal">NON</button>
-                                                    <form action="{{ route('ventes.destroy', $vente->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('delete')
-                                                        <button type="submit" class="btn btn-danger btn-sm">
-                                                            OUI
-                                                        </button>
-
-                                                    </form>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                        <p>{{ $ventes->links() }}</p>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
         </div>
 
-    </div>
+        <p id="noResult" class="notice-warn m-5 hidden">Aucun ticket ne correspond à cette recherche.</p>
+
+        <div class="overflow-x-auto">
+            <table class="table-officine">
+
+                <thead>
+                    <tr>
+                        <th>Ticket</th>
+                        <th class="text-right">Total</th>
+                        <th class="text-right">Date</th>
+                        <th class="text-right">Heure</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @forelse ($ventes as $vente)
+                        <tr class="vente-row" data-ticket="TCK-{{ $vente->id }}">
+
+                            <td class="figure font-medium">TCK-{{ $vente->id }}</td>
+
+                            <td class="num whitespace-nowrap font-semibold">
+                                {{ number_format($vente->total, 0, ',', ' ') }}
+                                <span class="text-xs font-normal text-ink-soft">FCFA</span>
+                            </td>
+
+                            <td class="num whitespace-nowrap">{{ $vente->date_vente->format('d/m/Y') }}</td>
+
+                            <td class="num whitespace-nowrap">{{ $vente->created_at->format('H:i:s') }}</td>
+
+                            <td>
+                                <div class="flex justify-end gap-2">
+                                    <a href="{{ route('ventes.show', $vente) }}" class="btn-ghost btn-sm">
+                                        Voir le ticket
+                                    </a>
+                                    <button type="button" data-dialog="supprimer-vente-{{ $vente->id }}"
+                                        class="btn-ghost btn-sm text-rouge-700 hover:border-rouge-100 hover:bg-rouge-50">
+                                        Supprimer
+                                    </button>
+                                </div>
+                            </td>
+
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="py-10 text-center text-ink-soft">
+                                Aucune vente enregistrée.
+                                <a href="{{ route('ventes.create') }}"
+                                    class="font-semibold text-officine-600 underline underline-offset-4">
+                                    Encaisser la première vente
+                                </a>.
+                            </td>
+                        </tr>
+                    @endforelse
+
+                </tbody>
+
+            </table>
+        </div>
+
+        @if ($ventes->hasPages())
+            <div class="border-t border-rule px-5 py-4">
+                {{ $ventes->links() }}
+            </div>
+        @endif
+
+    </section>
+
+    @foreach ($ventes as $vente)
+        <dialog id="supprimer-vente-{{ $vente->id }}" class="dialog-officine">
+
+            <div class="card-head">
+                <h2 class="card-title">Supprimer le ticket TCK-{{ $vente->id }} ?</h2>
+            </div>
+
+            <div class="p-5 text-sm text-ink-soft">
+                Les quantités vendues seront remises en stock. Cette action est définitive.
+            </div>
+
+            <div class="flex justify-end gap-2 border-t border-rule px-5 py-4">
+                <button type="button" data-dialog-close class="btn-ghost">Annuler</button>
+                <form action="{{ route('ventes.destroy', $vente) }}" method="POST">
+                    @csrf
+                    @method('delete')
+                    <button type="submit" class="btn-danger">Supprimer et restituer le stock</button>
+                </form>
+            </div>
+
+        </dialog>
+    @endforeach
+
 @endsection
-{{-- SCRIPT POUR RECHERCHE TICKET  --}}
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
 
-        const searchInput = document.getElementById('searchTicket');
+@push('scripts')
+    <script>
+        document.getElementById('searchTicket').addEventListener('input', function() {
 
-        searchInput.addEventListener('keyup', function() {
+            const recherche = this.value.trim().toLowerCase();
+            const lignes = document.querySelectorAll('.vente-row');
 
-            let valeur = this.value.toLowerCase();
-
-            let lignes = document.querySelectorAll('.vente-row');
-
-            let found = false;
+            let trouve = 0;
 
             lignes.forEach(ligne => {
-
-                let ticket = ligne.dataset.ticket.toLowerCase();
-
-                if (ticket.includes(valeur)) {
-
-                    ligne.style.display = '';
-
-                    found = true;
-
-                } else {
-
-                    ligne.style.display = 'none';
-                }
-
+                const correspond = ligne.dataset.ticket.toLowerCase().includes(recherche);
+                ligne.hidden = !correspond;
+                if (correspond) trouve++;
             });
 
-            let message = document.getElementById('noResult');
-
-            if (!found) {
-
-                message.style.display = 'block';
-
-            } else {
-
-                message.style.display = 'none';
-            }
-
+            document.getElementById('noResult').classList.toggle('hidden', trouve > 0);
         });
-
-    });
-</script>
+    </script>
+@endpush

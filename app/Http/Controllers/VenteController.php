@@ -2,20 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\VenteException;
 use App\Models\Medicament;
 use App\Models\Vente;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Dompdf\Adapter\PDFLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class VenteController extends Controller
 {
     public function search(Request $request)
     {
-        $query = $request->q;
+        $query = (string) $request->q;
 
-        $medicaments = Medicament::where('nom', 'LIKE', "%$query%")
+        $medicaments = Medicament::select('id', 'nom', 'prix', 'stock')
+            ->where('nom', 'LIKE', '%' . $query . '%')
+            ->orderBy('nom')
+            ->limit(20)
             ->get();
 
         return response()->json($medicaments);
@@ -35,49 +39,72 @@ class VenteController extends Controller
             ], 422);
         }
 
-        $total = 0;
-
         foreach ($panier as $item) {
 
-            if (!isset($item['id'], $item['prix'], $item['quantite'])) {
+            if (!isset($item['id'], $item['quantite']) || (int) $item['quantite'] < 1) {
                 return response()->json([
                     'error' => 'Données panier incorrectes'
                 ], 422);
             }
-
-            $total += $item['prix'] * $item['quantite'];
         }
 
-        $vente = Vente::create([
-            'total' => $total,
-            'date_vente' => now(),
-            'user_id' => Auth::user()->id,
-        ]);
+        try {
+            $vente = DB::transaction(function () use ($panier) {
 
-        foreach ($panier as $item) {
+                // verrouiller les lignes le temps de la transaction pour éviter
+                // que deux ventes simultanées ne consomment le même stock
+                $medicaments = Medicament::whereIn('id', array_column($panier, 'id'))
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('id');
 
-            $medicament = Medicament::find($item['id']);
+                $lignes = [];
+                $total = 0;
 
-            if (!$medicament) {
-                return response()->json([
-                    'error' => 'Médicament introuvable'
-                ], 404);
-            }
+                // tout contrôler AVANT la moindre écriture
+                foreach ($panier as $item) {
 
-            if ($medicament->stock < $item['quantite']) {
-                return response()->json([
-                    'error' => 'Stock insuffisant pour ' . $medicament->nom
-                ], 422);
-            }
+                    $medicament = $medicaments->get($item['id']);
 
-            $vente->medicaments()->attach($medicament->id, [
-                'quantite' => $item['quantite'],
-                'prix' => $item['prix'],
-                'sous_total' => $item['prix'] * $item['quantite']
-            ]);
+                    if (!$medicament) {
+                        throw new VenteException('Médicament introuvable', 404);
+                    }
 
-            $medicament->stock -= $item['quantite'];
-            $medicament->save();
+                    $quantite = (int) $item['quantite'];
+
+                    if ($medicament->stock < $quantite) {
+                        throw new VenteException('Stock insuffisant pour ' . $medicament->nom, 422);
+                    }
+
+                    // le prix vient toujours de la base, jamais du client
+                    $sousTotal = $medicament->prix * $quantite;
+                    $total += $sousTotal;
+
+                    $lignes[$medicament->id] = [
+                        'quantite' => $quantite,
+                        'prix' => $medicament->prix,
+                        'sous_total' => $sousTotal,
+                    ];
+                }
+
+                $vente = Vente::create([
+                    'total' => $total,
+                    'date_vente' => now(),
+                    'user_id' => Auth::id(),
+                ]);
+
+                $vente->medicaments()->attach($lignes);
+
+                foreach ($lignes as $medicamentId => $ligne) {
+                    $medicaments->get($medicamentId)->decrement('stock', $ligne['quantite']);
+                }
+
+                return $vente;
+            });
+        } catch (VenteException $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], $e->getCode());
         }
 
         return response()->json([
@@ -108,20 +135,19 @@ class VenteController extends Controller
     // VENTES SUPPRESSIONS METHODES
     public function destroy(Vente $vente)
     {
-        // remettre stock
+        DB::transaction(function () use ($vente) {
 
-        foreach ($vente->medicaments as $medicament) {
+            // remettre stock
+            foreach ($vente->medicaments as $medicament) {
+                $medicament->increment('stock', $medicament->pivot->quantite);
+            }
 
-            $medicament->stock += $medicament->pivot->quantite;
+            // supprimer pivot
+            $vente->medicaments()->detach();
 
-            $medicament->save();
-        }
-
-        // supprimer pivot
-        $vente->medicaments()->detach();
-
-        // supprimer vente
-        $vente->delete();
+            // supprimer vente
+            $vente->delete();
+        });
 
         return redirect()
             ->route('ventes.index')->with('alert', 'Vente supprimée avec succès et stock mis à jour');

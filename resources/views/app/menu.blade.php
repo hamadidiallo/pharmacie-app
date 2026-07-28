@@ -1,142 +1,80 @@
-<nav class="navbar navbar-expand-lg shadow-sm py-3" style="background: linear-gradient(135deg, #0d6efd, #6610f2);">
+@php
+    $liens = [
+        ['route' => 'dashboard', 'libelle' => 'Tableau de bord'],
+        ['route' => 'medicaments.index', 'libelle' => 'Médicaments'],
+        ['route' => 'ventes.index', 'libelle' => 'Ventes'],
+        ['route' => 'dashboard.top_produit', 'libelle' => 'Statistiques'],
+    ];
+@endphp
 
-    <div class="container">
+<header class="sticky top-0 z-40 border-b border-rule bg-surface/95 backdrop-blur">
+    <div class="mx-auto flex w-full max-w-6xl items-center gap-4 px-4 py-3 sm:px-6">
 
-        <!-- LOGO -->
-        <a class="navbar-brand fw-bold text-white fs-3" href="#">
+        {{-- La croix verte : le signe des officines --}}
+        <a href="{{ auth()->check() ? route('dashboard') : route('auth.login') }}"
+            class="flex shrink-0 items-center gap-2.5">
 
-            💊 GESTA PHARM
+            <span class="grid size-8 place-items-center rounded bg-officine-500" aria-hidden="true">
+                <svg viewBox="0 0 24 24" class="size-5 fill-white">
+                    <path d="M9.5 3h5v6.5H21v5h-6.5V21h-5v-6.5H3v-5h6.5V3Z" />
+                </svg>
+            </span>
+
+            <span class="text-sm font-bold uppercase tracking-widest">GESTA PHARM</span>
 
         </a>
 
-        <!-- MENU MOBILE -->
-        <button class="navbar-toggler bg-white" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent">
+        @auth
+            <button type="button" data-menu-toggle aria-expanded="false" aria-controls="menu-principal"
+                class="btn-ghost btn-sm ml-auto md:hidden">
+                Menu
+            </button>
+        @endauth
 
-            <span class="navbar-toggler-icon"></span>
+        <nav id="menu-principal"
+            class="@auth hidden @endauth absolute inset-x-0 top-full border-b border-rule bg-surface px-4 py-3
+                   md:static md:mx-auto md:flex md:border-0 md:bg-transparent md:p-0">
 
-        </button>
-
-        <!-- MENU -->
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-
-            <!-- LIENS CENTRE -->
             @auth
-
-                <ul class="navbar-nav mx-auto gap-2">
-
-                    <li class="nav-item">
-                        <a class="nav-link text-white fw-semibold nav-hover" href="{{route('dashboard')}}">
-
-                            🏠 Dashboard
-
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link text-white fw-semibold nav-hover" href="{{route('medicaments.index')}}">
-
-                            💊 Médicaments
-
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link text-white fw-semibold nav-hover" href="{{route('ventes.index')}}">
-
-                            🛒 Ventes
-
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link text-white fw-semibold nav-hover" href="{{route('dashboard')}}">
-
-                            📊 Statistiques
-
-                        </a>
-                    </li>
-
+                <ul class="flex flex-col gap-1 md:flex-row md:items-center md:gap-1">
+                    @foreach ($liens as $lien)
+                        <li>
+                            <a href="{{ route($lien['route']) }}"
+                                @class([
+                                    'block rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                                    'bg-officine-50 text-officine-700' => request()->routeIs($lien['route']),
+                                    'text-ink-soft hover:bg-officine-50 hover:text-officine-700' => !request()->routeIs(
+                                        $lien['route']),
+                                ])>
+                                {{ $lien['libelle'] }}
+                            </a>
+                        </li>
+                    @endforeach
                 </ul>
-
             @endauth
 
-            <!-- BOUTONS A DROITE -->
-            <div class="ms-auto d-flex gap-2 align-items-center">
+        </nav>
 
-                @guest
+        <div class="ml-auto flex shrink-0 items-center gap-2">
 
-                    <a href="{{ route('auth.login') }}" class="btn btn-light fw-bold rounded-pill px-4">
+            @guest
+                <a href="{{ route('auth.login') }}" class="btn-ghost btn-sm">Se connecter</a>
+                <a href="{{ route('auth.register') }}" class="btn-primary btn-sm">Créer un compte</a>
+            @endguest
 
-                        SE CONNECTER
+            @auth
+                <span class="hidden text-sm text-ink-soft sm:inline">
+                    {{ auth()->user()->firstname }}
+                </span>
 
-                    </a>
-
-                    <a href="{{ route('auth.register') }}" class="btn btn-warning fw-bold rounded-pill px-4">
-
-                        INSCRIPTION
-
-                    </a>
-
-                @endguest
-
-                @auth
-
-                    <span class="text-white fw-bold">
-
-                        👋 {{ auth()->user()->firstname }}
-
-                    </span>
-
-                    <form action="{{ route('auth.logout') }}" method="post">
-
-                        @csrf
-                        @method('delete')
-
-                        <button class="btn btn-danger rounded-pill fw-bold px-4">
-
-                            DÉCONNEXION
-
-                        </button>
-
-                    </form>
-
-                @endauth
-
-            </div>
+                <form action="{{ route('auth.logout') }}" method="post">
+                    @csrf
+                    @method('delete')
+                    <button class="btn-ghost btn-sm">Déconnexion</button>
+                </form>
+            @endauth
 
         </div>
 
     </div>
-
-</nav>
-
-<style>
-    .nav-hover {
-
-        transition: 0.3s;
-        border-radius: 10px;
-        padding: 8px 15px !important;
-
-    }
-
-    .nav-hover:hover {
-
-        background-color: rgba(255, 255, 255, 0.2);
-
-        transform: translateY(-2px);
-
-    }
-
-    .btn {
-
-        transition: 0.3s;
-
-    }
-
-    .btn:hover {
-
-        transform: scale(1.05);
-
-    }
-</style>
+</header>

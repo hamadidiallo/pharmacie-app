@@ -1,198 +1,161 @@
 @extends('layout')
+
+@section('titre', 'Médicaments — GESTA PHARM')
+
 @section('content')
-    <nav>
-        @include('app.menu')
-    </nav>
-    <section class="container">
-        <br>
 
-        <div class="card shadow">
+    <section class="card-officine overflow-hidden">
 
-            <div class="card-header d-flex justify-content-between">
-
-                <h3>Liste des Médicaments</h3>
-
-                <a href="{{ route('medicament.create') }}" class="btn btn-outline-info ">
-                    Ajouter un medicament
-                </a>
-
+        <div class="card-head">
+            <div>
+                <h1 class="card-title">Médicaments</h1>
+                <p class="mt-0.5 text-sm text-ink-soft">{{ $medicaments->total() }} produits référencés.</p>
             </div>
-
-            <div class="card-body">
-
-                <table class="table table-bordered table-hover w-100">
-
-                    <thead class="table-dark">
-
-                        <tr class="text-center">
-                            <th>ID</th>
-                            <th>Nom</th>
-                            <th>Prix</th>
-                            <th>Quantité</th>
-                            <th>Date Expiration</th>
-                            <th>Description</th>
-                            <th>Actions</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        @forelse ($medicaments as $medicament)
-                            <tr class="text-center">
-                                <td>
-                                    {{ $medicament->id }}
-                                </td>
-                                <td>
-                                    {{ $medicament->nom }}
-                                </td>
-
-                                <td>
-                                    {{ $medicament->prix }} FCFA
-                                </td>
-
-                                <td>
-
-                                    @if ($medicament->stock <= 5)
-                                        <span id="stock-{{ $medicament->id }} "class="badge bg-danger">
-                                            Stock faible :
-                                            {{ $medicament->stock }}
-                                        </span>
-                                    @else
-                                        <span id="stock-{{ $medicament->id }}" class="badge bg-success">
-                                            {{ $medicament->stock }}
-                                        </span>
-                                    @endif
-
-                                </td>
-
-                                <td>
-                                    {{ $medicament->date_expiration->format('d - m - y') }}
-                                </td>
-
-                                <td>
-                                    {{ $medicament->description }}
-                                </td>
-
-                                <td class="d-flex gap-2 justify-content-center">
-                                    <!-- Button trigger modal -->
-                                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
-                                        data-bs-target="#delete{{ $medicament->id }}">
-                                        SUPPRIMER
-                                    </button>
-
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="delete{{ $medicament->id }}" tabindex="-1"
-                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">SUPPRESSION
-                                                        MEDICAMENT</h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    VOULEZ-VOUS SUPPRIMER CE MEDICAMENT ?
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary"
-                                                        data-bs-dismiss="modal">NON</button>
-                                                    <form action="{{ route('medicament.delete', $medicament) }}"
-                                                        method="POST">
-                                                        @csrf
-                                                        @method('delete')
-                                                        <button type="submit" class="btn btn-danger btn-sm">
-                                                            OUI
-                                                        </button>
-
-                                                    </form>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Button trigger modal -->
-                                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal"
-                                        data-bs-target="#update{{ $medicament->id }}">
-                                        MODIFIER
-                                    </button>
-
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="update{{ $medicament->id }}" tabindex="-1"
-                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">MODIFICATION
-                                                        MEDICAMENT</h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    @include('medicaments.edit', [
-                                                        'medicament' => $medicament,
-                                                    ])
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-
-
-
-                                </td>
-
-                            </tr>
-
-                        @empty
-
-                            <tr>
-                                <td colspan="6" class="text-center">
-                                    Nous n'avons pas de médicaments pour l'instant.
-                                </td>
-                            </tr>
-                        @endforelse
-                        <p>{{ $medicaments->links() }}</p>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
+            <a href="{{ route('medicament.create') }}" class="btn-primary btn-sm">Ajouter un produit</a>
         </div>
 
+        <div class="overflow-x-auto">
+            <table class="table-officine">
+
+                <thead>
+                    <tr>
+                        <th class="w-12">Réf</th>
+                        <th>Produit</th>
+                        <th class="text-right">Prix</th>
+                        <th class="text-right">Stock</th>
+                        <th class="text-right">Expiration</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @forelse ($medicaments as $medicament)
+                        <tr>
+
+                            <td class="num text-ink-soft">{{ $medicament->id }}</td>
+
+                            <td>
+                                <span class="font-medium">{{ $medicament->nom }}</span>
+                                <span class="mt-0.5 block text-xs text-ink-soft">{{ $medicament->description }}</span>
+                            </td>
+
+                            <td class="num whitespace-nowrap">
+                                {{ number_format($medicament->prix, 0, ',', ' ') }}
+                                <span class="text-xs text-ink-soft">FCFA</span>
+                            </td>
+
+                            <td class="num">
+                                @if ($medicament->stock === 0)
+                                    <span class="badge-rupture" id="stock-{{ $medicament->id }}">rupture</span>
+                                @elseif ($medicament->stock <= 5)
+                                    <span class="badge-faible" id="stock-{{ $medicament->id }}">
+                                        {{ $medicament->stock }}
+                                    </span>
+                                @else
+                                    <span class="badge-ok" id="stock-{{ $medicament->id }}">
+                                        {{ $medicament->stock }}
+                                    </span>
+                                @endif
+                            </td>
+
+                            <td class="num whitespace-nowrap">
+                                {{ $medicament->date_expiration->format('d/m/Y') }}
+                            </td>
+
+                            <td>
+                                <div class="flex justify-end gap-2">
+                                    <button type="button" data-dialog="modifier-{{ $medicament->id }}"
+                                        class="btn-ghost btn-sm">
+                                        Modifier
+                                    </button>
+                                    <button type="button" data-dialog="supprimer-{{ $medicament->id }}"
+                                        class="btn-ghost btn-sm text-rouge-700 hover:bg-rouge-50 hover:border-rouge-100">
+                                        Supprimer
+                                    </button>
+                                </div>
+                            </td>
+
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="py-10 text-center text-ink-soft">
+                                Aucun médicament pour l'instant.
+                                <a href="{{ route('medicament.create') }}"
+                                    class="font-semibold text-officine-600 underline underline-offset-4">
+                                    Ajoutez le premier produit
+                                </a>.
+                            </td>
+                        </tr>
+                    @endforelse
+
+                </tbody>
+
+            </table>
+        </div>
+
+        @if ($medicaments->hasPages())
+            <div class="border-t border-rule px-5 py-4">
+                {{ $medicaments->links() }}
+            </div>
+        @endif
 
     </section>
+
+    {{-- Les boîtes de dialogue vivent hors du tableau pour ne pas casser sa structure. --}}
+    @foreach ($medicaments as $medicament)
+
+        <dialog id="modifier-{{ $medicament->id }}" class="dialog-officine">
+
+            <div class="card-head">
+                <h2 class="card-title">Modifier {{ $medicament->nom }}</h2>
+                <button type="button" data-dialog-close class="btn-ghost btn-sm" aria-label="Fermer">Fermer</button>
+            </div>
+
+            <div class="p-5">
+                @include('medicaments.edit', ['medicament' => $medicament])
+            </div>
+
+        </dialog>
+
+        <dialog id="supprimer-{{ $medicament->id }}" class="dialog-officine">
+
+            <div class="card-head">
+                <h2 class="card-title">Supprimer ce médicament ?</h2>
+            </div>
+
+            <div class="p-5 text-sm text-ink-soft">
+                <strong class="font-semibold text-ink">{{ $medicament->nom }}</strong>
+                sera retiré du stock. Cette action est définitive.
+            </div>
+
+            <div class="flex justify-end gap-2 border-t border-rule px-5 py-4">
+                <button type="button" data-dialog-close class="btn-ghost">Annuler</button>
+                <form action="{{ route('medicament.delete', $medicament) }}" method="POST">
+                    @csrf
+                    @method('delete')
+                    <button type="submit" class="btn-danger">Supprimer</button>
+                </form>
+            </div>
+
+        </dialog>
+
+    @endforeach
+
 @endsection
-{{-- // SCRIPTS JS POUR RENVOIE STOCK RESTANT APRES VENTE CHAQUE 2 SECONDES --}}
-<script>
-    setInterval(() => {
 
-        fetch('/stocks')
-
-            .then(res => res.json())
-
-            .then(data => {
-
-                data.forEach(medicament => {
-
-                    let stockElement = document.getElementById(
-                        'stock-' + medicament.id
-                    );
-
-                    if (stockElement) {
-
-                        stockElement.innerText = medicament.stock;
-
-                    }
-
+@push('scripts')
+    <script>
+        // Rafraîchit les pastilles de stock sans recharger la page.
+        fetch('/medicaments/stocks')
+            .then(reponse => reponse.json())
+            .then(medicaments => {
+                medicaments.forEach(medicament => {
+                    const pastille = document.getElementById('stock-' + medicament.id);
+                    if (!pastille) return;
+                    pastille.textContent = medicament.stock === 0 ? 'rupture' : medicament.stock;
                 });
-
-            });
-
-    }, 2000);
-</script>
+            })
+            .catch(() => {});
+    </script>
+@endpush

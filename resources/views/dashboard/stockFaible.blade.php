@@ -1,38 +1,47 @@
- @extends('layout')
- @section('content')
-     <nav>
-         @include('app.menu')
-     </nav>
-     <div class="row mt-4">
-         <div class="col-md-12">
-             <div class="card-body">
-                 <div class="card-header  text-white text-center fs-30 p-40">
-                     LISTE PRODUIT STOCK FAIBLE
-                 </div>
-                 <table class="table table-striped text-center">
-                     <thead>
-                         <tr>
-                             <th>NOM PODUIT</th>
-                             <th>STOCK</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         @forelse($stockFaible as $m)
-                             <tr>
-                                 <td>{{ $m->nom }}</td>
-                                 <span class="badge bg-info">
-                                     <td>{{ $m->stock }}</td>
-                                 </span>
-                             </tr>
-                         @empty
-                             <tr>
-                                 <td colspan="2">AUCUNE STOCK FAIBLE</td>
-                             </tr>
-                         @endforelse
-                     </tbody>
-                 </table>
+@extends('layout')
 
-             </div>
-         </div>
-     </div>
- @endsection
+@section('titre', 'Stock faible — GESTA PHARM')
+
+@section('content')
+
+    <section class="card-officine overflow-hidden">
+
+        <div class="card-head">
+            <div>
+                <h1 class="card-title">Stock faible</h1>
+                <p class="mt-0.5 text-sm text-ink-soft">Il reste 5 unités ou moins.</p>
+            </div>
+            <span class="badge-faible">{{ $stockFaible->count() }}</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="table-officine">
+
+                <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th class="text-right">Stock restant</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @forelse ($stockFaible as $medicament)
+                        <tr>
+                            <td class="font-medium">{{ $medicament->nom }}</td>
+                            <td class="num"><span class="badge-faible">{{ $medicament->stock }}</span></td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="2" class="py-10 text-center text-ink-soft">
+                                Aucun produit en stock faible.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+
+            </table>
+        </div>
+
+    </section>
+
+@endsection

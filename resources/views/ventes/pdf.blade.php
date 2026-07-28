@@ -45,9 +45,9 @@
 
     <hr>
 
-    <p><strong>Ticket N° :</strong> {{ $vente->id }}</p>
-    <p><strong>Date :</strong> {{ $vente->date_vente }}</p>
-    <p><strong>Heure :</strong> {{ $vente->created_at->format('h:i:m') }}</p>
+    <p><strong>Ticket N° :</strong> TCK-{{ $vente->id }}</p>
+    <p><strong>Date :</strong> {{ $vente->date_vente->format('d/m/Y') }}</p>
+    <p><strong>Heure :</strong> {{ $vente->created_at->format('H:i:s') }}</p>
 
     <table>
         <thead>

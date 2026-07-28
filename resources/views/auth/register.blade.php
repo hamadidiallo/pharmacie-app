@@ -1,78 +1,46 @@
 @extends('layout')
-<nav>
-    @include('app.menu')
-</nav>
+
+@section('titre', 'Créer un compte — GESTA PHARM')
 
 @section('content')
-    <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="mx-auto max-w-sm py-8">
 
-        <div class="card shadow-lg border-0 rounded-4 p-4" style="width: 100%; max-width: 500px;">
+        <div class="mb-8">
+            <p class="mb-2 font-mono text-xs uppercase tracking-widest text-officine-600">Officine</p>
+            <h1 class="text-2xl font-bold tracking-tight">CRÉER UN COMPTE</h1>
+            <p class="mt-1 text-sm text-ink-soft">Un compte par personne travaillant au comptoir.</p>
+        </div>
 
-            <div class="text-center mb-4">
+        <div class="card-officine p-6">
 
-                <h1 class="fw-bold text-primary">
-                    INSCRIPTION
-                </h1>
-
-                <p class="text-muted">
-                    Créez votre compte utilisateur
-                </p>
-
-            </div>
-
-            <form action="" method="post">
+            <form action="{{ route('auth.register') }}" method="post">
 
                 @csrf
 
-                <div class="mb-3">
-
-                    <x-component.input name="firstname" type="text" value="{{ old('firstname') }}" label="Prénom :" />
-
+                <div class="grid gap-x-4 sm:grid-cols-2">
+                    <x-component.input name="firstname" value="{{ old('firstname') }}" label="Prénom" />
+                    <x-component.input name="lastname" value="{{ old('lastname') }}" label="Nom" />
                 </div>
 
-                <div class="mb-3">
+                <x-component.input name="email" type="email" value="{{ old('email') }}" label="Email" />
 
-                    <x-component.input name="lastname" type="text" value="{{ old('lastname') }}" label="Nom :" />
+                <x-component.input name="password" type="password" label="Mot de passe" />
 
-                </div>
+                <p class="-mt-2 mb-4 text-xs text-ink-soft">8 caractères minimum.</p>
 
-                <div class="mb-3">
-
-                    <x-component.input name="email" type="email" value="{{ old('email') }}" label="Email :" />
-
-                </div>
-
-                <div class="mb-4">
-
-                    <x-component.input name="password" type="password" value="" label="Mot de passe :" />
-
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold rounded-3">
-
-                    CREER UN COMPTE
-
-                </button>
+                <button class="btn-primary w-full">Créer le compte</button>
 
             </form>
 
-            <div class="text-center mt-4">
-
-                <small class="text-muted">
-                    Vous avez déjà un compte ?
-                </small>
-
-                <br>
-
-                <a href="" class="text-decoration-none fw-bold text-primary">
-
-                    Se connecter
-
-                </a>
-
-            </div>
-
         </div>
+
+        <p class="mt-6 text-center text-sm text-ink-soft">
+            Vous avez déjà un compte ?
+            <a href="{{ route('auth.login') }}"
+                class="font-semibold text-officine-600 underline underline-offset-4 hover:text-officine-700">
+                Se connecter
+            </a>
+        </p>
 
     </div>
 @endsection

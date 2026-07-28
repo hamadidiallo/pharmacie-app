@@ -1,16 +1,25 @@
-@extends('layout')
-    <section class="container">
-        <br>
-        <form action="{{route('medicament.update',$medicament)}}" method="post">
-            @method('put')
-            @csrf
-            <x-component.input type='text' name='nom' value='{{$medicament->nom}}' label='Nom Medicament :'/>
-            <x-component.input type='decimal' name='prix' value='{{$medicament->prix}}' label='Prix Unitaire : '/>
-            <x-component.input type='number' name='stock' value='{{$medicament->stock}}' label='Quantité : '/>
-            <x-component.input type='date' name='date_expiration' value="{{ $medicament->date_expiration->format('Y-m-d')}}" label='Date Expiration : '/>
-            <x-component.input type='text' name='description' value='{{$medicament->description}}' label='Description :'/>
-            <hr>
-            <button class="btn btn-outline-warning">MODIFIER</button>
-        </form>
-    </section>
+{{-- partiel inclus dans la modale de modification de medicaments/index --}}
+<form action="{{ route('medicament.update', $medicament) }}" method="post">
 
+    @method('put')
+    @csrf
+
+    <x-component.input name="nom" value="{{ $medicament->nom }}" label="Nom du médicament" />
+
+    <div class="grid gap-x-4 sm:grid-cols-2">
+        <x-component.input name="prix" type="number" value="{{ $medicament->prix }}" label="Prix unitaire (FCFA)" />
+        <x-component.input name="stock" type="number" value="{{ $medicament->stock }}" label="Quantité" />
+    </div>
+
+    <x-component.input name="date_expiration" type="date"
+        value="{{ $medicament->date_expiration->format('Y-m-d') }}" label="Date d'expiration" />
+
+    <x-component.input name="description" type="textarea" value="{{ $medicament->description }}"
+        label="Description" />
+
+    <div class="flex justify-end gap-2">
+        <button type="button" data-dialog-close class="btn-ghost">Annuler</button>
+        <button type="submit" class="btn-primary">Enregistrer</button>
+    </div>
+
+</form>

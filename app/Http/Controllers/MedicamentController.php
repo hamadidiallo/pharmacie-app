@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreMedicamentRequest;
 use App\Models\Medicament;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MedicamentController extends Controller
 {
@@ -30,10 +30,9 @@ class MedicamentController extends Controller
      */
     public function store(StoreMedicamentRequest $request)
     {
-        $medicament = $request->validated();
         // rechercher médicament identique
         $medicament = Medicament::where('nom', $request->nom)
-            ->where('date_expiration', $request->date_expiration)
+            ->whereDate('date_expiration', $request->date_expiration)
             ->where('description', $request->description)
             ->where('prix', $request->prix)
             ->first();
@@ -54,38 +53,13 @@ class MedicamentController extends Controller
 
         // sinon créer nouveau
         Medicament::create([
-            'nom' => $request->nom,
-            'prix' => $request->prix,
-            'stock' => $request->stock,
-            'date_expiration' => $request->date_expiration,
-            'description' => $request->description,
+            ...$request->validated(),
+            'user_id' => Auth::id(),
         ]);
 
         return redirect()->route('medicaments.index')->with('alert', 'Médicament ajouté avec succès');
     }
 
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Medicament $medicament)
-    {
-        return view('medicaments.edit', ['medicament' => $medicament]);
-    }
-    public function search(Request $request)
-    {
-        return response()->json([
-            'test' => 'OK'
-        ]);
-    }
 
     /**
      * Update the specified resource in storage.

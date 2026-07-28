@@ -2,17 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Medicament extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'nom',
         'prix',
         'stock',
         'date_expiration',
         'description',
+        'user_id',
     ];
     protected $casts = [
         'date_expiration' => 'date',
@@ -23,6 +26,7 @@ class Medicament extends Model
             Vente::class,
             'medicament__vente'
         )
+            ->using(Medicament_Vente::class)
             ->withPivot('quantite', 'prix', 'sous_total')
             ->withTimestamps();
     }

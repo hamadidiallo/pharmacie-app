@@ -1,81 +1,89 @@
 @extends('layout')
 
+@section('titre', 'Nouvelle vente — GESTA PHARM')
+
 @section('content')
-    <nav>@include('app.menu')</nav>
-    <div id="messageStock"></div>
-    <div class="container mt-4">
 
-        <div class="card shadow">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold tracking-tight">Nouvelle vente</h1>
+        <p class="mt-1 text-sm text-ink-soft">Cherchez un produit, ajustez les quantités, encaissez.</p>
+    </div>
 
-            <div class="card-header">
+    <div id="messageStock" class="mb-4 empty:mb-0" role="status"></div>
 
-                <h3>
-                    Nouvelle Vente
-                </h3>
+    <div class="grid gap-5 lg:grid-cols-5">
 
+        {{-- Recherche --}}
+        <section class="card-officine lg:col-span-2">
+
+            <div class="card-head">
+                <h2 class="card-title">Rechercher un produit</h2>
             </div>
 
-            <div class="card-body">
+            <div class="p-5">
 
-                <div class="row">
+                <label for="search" class="sr-only">Rechercher un médicament</label>
+                <input type="search" id="search" class="field-input" placeholder="Nom du médicament" autofocus>
 
-                    <!-- RECHERCHE -->
-                    <div class="col-md-5">
-
-                        <input type="text" id="search" class="form-control" placeholder="Rechercher médicament">
-
-                        <div id="resultats" class="mt-3">
-
-                        </div>
-
-                    </div>
-
-                    <!-- PANIER -->
-                    <div class="col-md-7">
-
-                        <div class="card shadow">
-
-                            <div class="card-header">
-                                🛒 Panier
-                            </div>
-
-                            <div class="card-body">
-
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr class="text-center">
-                                            <th>Produit</th>
-                                            <th>Prix</th>
-                                            <th>Quantité</th>
-                                            <th>Total</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody id="panier">
-                                        <!-- JS va remplir ici -->
-                                    </tbody>
-                                </table>
-
-                                <h4>
-                                    Total : <span id="total">0</span> FCFA
-                                </h4>
-
-                                <button class="btn btn-success w-100" onclick="validerVente()">
-                                    Valider Vente
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
+                <div id="resultats" class="mt-4 space-y-2">
+                    <p class="py-8 text-center text-sm text-ink-soft">
+                        Tapez les premières lettres d'un médicament.
+                    </p>
                 </div>
 
             </div>
 
-        </div>
+        </section>
+
+        {{-- Panier --}}
+        <section class="card-officine lg:col-span-3">
+
+            <div class="card-head">
+                <h2 class="card-title">Panier</h2>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="table-officine">
+
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th class="text-right">Prix</th>
+                            <th class="text-center">Quantité</th>
+                            <th class="text-right">Sous-total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="panier">
+                        {{-- rempli par resources/js/ventes/vente.js --}}
+                    </tbody>
+
+                </table>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-4 border-t border-rule px-5 py-4">
+
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-ink-soft">Total</p>
+                    <p class="figure text-3xl font-bold">
+                        <span id="total">0</span>
+                        <span class="text-sm font-medium text-ink-soft">FCFA</span>
+                    </p>
+                </div>
+
+                <button type="button" onclick="validerVente()" class="btn-primary">
+                    Valider la vente
+                </button>
+
+            </div>
+
+        </section>
 
     </div>
+
 @endsection
+
+@push('scripts')
+    @vite('resources/js/ventes/vente.js')
+@endpush

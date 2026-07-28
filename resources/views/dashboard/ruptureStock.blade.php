@@ -1,30 +1,47 @@
- @extends('layout')
- @section('content')
-     <nav>
-         @include('app.menu')
-     </nav>
-     <div class="card-body">
-         <div class="card-header bg-dark text-white text-center fs-30">
-             LISTE PRODUIT EN RUPTURE DE STOCK
-         </div>
-         <table class="table table-striped text-center">
-             <thead>
-                 <tr>
-                     <th>NOM PODUIT</th>
-                 </tr>
-             </thead>
-             <tbody>
-                 @forelse($ruptureStock as $m)
-                     <tr>
-                         <td>{{ $m->nom }}</td>
-                     </tr>
-                 @empty
-                     <tr>
-                         <td colspan="1">AUCUNE RUPTURE DE STOCK</td>
-                     </tr>
-                 @endforelse
-             </tbody>
-         </table>
+@extends('layout')
 
-     </div>
- @endsection
+@section('titre', 'Ruptures de stock — GESTA PHARM')
+
+@section('content')
+
+    <section class="card-officine overflow-hidden">
+
+        <div class="card-head">
+            <div>
+                <h1 class="card-title">En rupture de stock</h1>
+                <p class="mt-0.5 text-sm text-ink-soft">Produits à commander en priorité.</p>
+            </div>
+            <span class="badge-rupture">{{ $ruptureStock->count() }}</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="table-officine">
+
+                <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th class="text-right">Stock</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @forelse ($ruptureStock as $medicament)
+                        <tr>
+                            <td class="font-medium">{{ $medicament->nom }}</td>
+                            <td class="num"><span class="badge-rupture">0</span></td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="2" class="py-10 text-center text-ink-soft">
+                                Aucune rupture. Tous les produits sont en stock.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+
+            </table>
+        </div>
+
+    </section>
+
+@endsection

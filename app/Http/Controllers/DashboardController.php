@@ -21,7 +21,13 @@ class DashboardController extends Controller
                 now()->endOfWeek()
             ]
         )->sum('total');
-        $venteMois = Vente::whereMonth('date_vente', now()->month)->sum('total');
+        $venteMois = Vente::whereBetween(
+            'date_vente',
+            [
+                now()->startOfMonth(),
+                now()->endOfMonth()
+            ]
+        )->sum('total');
         $venteTrimestre = Vente::whereBetween(
             'date_vente',
             [
@@ -31,7 +37,22 @@ class DashboardController extends Controller
         )->sum('total');
         // TOTAL MEDICAMENTS
         $totalMedicaments = Medicament::count();
-        return view('dashboard.index', compact('venteJour', 'venteSemaine', 'venteMois', 'venteTrimestre', 'totalMedicaments'));
+
+        // ALERTES : ce qui demande une action au comptoir
+        $nbRuptures = Medicament::where('stock', 0)->count();
+        $nbStockFaible = Medicament::where('stock', '>', 0)->where('stock', '<=', 5)->count();
+        $nbExpirations = Medicament::whereBetween('date_expiration', [now(), now()->addDays(30)])->count();
+
+        return view('dashboard.index', compact(
+            'venteJour',
+            'venteSemaine',
+            'venteMois',
+            'venteTrimestre',
+            'totalMedicaments',
+            'nbRuptures',
+            'nbStockFaible',
+            'nbExpirations'
+        ));
     }
     public function top_produit()
     {

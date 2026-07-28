@@ -1,68 +1,53 @@
 @extends('layout')
+
+@section('titre', 'Top 5 des produits — GESTA PHARM')
+
 @section('content')
-    <nav>
-        @include('app.menu')
-    </nav>
-    <section>
-        <div class="row mt-4">
 
-            <div class="col-md-12">
+    <section class="card-officine overflow-hidden">
 
-                <div class="card shadow">
-
-                    <div class="card-header bg-dark text-white text-center fs-30">
-                        TOP 5 DES PRODUITS LES PLUS VENDUS
-                    </div>
-
-                    <div class="card-body">
-
-                        <table class="table table-striped text-center">
-
-                            <thead>
-                                <tr>
-                                    <th>Produit</th>
-                                    <th>Quantité Vendue</th>
-                                    <th>Montant Généré</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                @forelse($topMedicaments as $m)
-                                    <tr>
-                                        <td>{{ $m->nom }}</td>
-
-                                        <td>
-                                            <span class="badge bg-primary">
-                                                {{ $m->total_quantite }}
-                                            </span>
-                                        </td>
-
-                                        <td>
-                                            <span class="badge bg-success">
-                                                {{ number_format($m->total_montant, 0, ',', ' ') }} FCFA
-                                            </span>
-                                        </td>
-                                    </tr>
-
-                                @empty
-
-                                    <tr>
-                                        <td colspan="3">Aucune vente enregistrée</td>
-                                    </tr>
-                                @endforelse
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
+        <div class="card-head">
+            <div>
+                <h1 class="card-title">Top 5 des produits</h1>
+                <p class="mt-0.5 text-sm text-ink-soft">Classés par quantité vendue.</p>
             </div>
+        </div>
 
+        <div class="overflow-x-auto">
+            <table class="table-officine">
+
+                <thead>
+                    <tr>
+                        <th class="w-10">Rang</th>
+                        <th>Produit</th>
+                        <th class="text-right">Quantité vendue</th>
+                        <th class="text-right">Montant généré</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @forelse ($topMedicaments as $medicament)
+                        <tr>
+                            <td class="num text-ink-soft">{{ $loop->iteration }}</td>
+                            <td class="font-medium">{{ $medicament->nom }}</td>
+                            <td class="num">{{ number_format($medicament->total_quantite, 0, ',', ' ') }}</td>
+                            <td class="num font-semibold">
+                                {{ number_format($medicament->total_montant, 0, ',', ' ') }}
+                                <span class="text-xs font-normal text-ink-soft">FCFA</span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="py-10 text-center text-ink-soft">
+                                Aucune vente enregistrée pour l'instant.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+
+            </table>
         </div>
 
     </section>
+
 @endsection
