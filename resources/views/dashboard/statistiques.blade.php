@@ -124,9 +124,7 @@
 
                 <tbody>
                     @forelse ($surveillance as $medicament)
-                        @php
-                            $expireBientot = $medicament->date_expiration->between(now(), now()->addDays(30));
-                        @endphp
+                        @php $expireBientot = $medicament->expireBientot(); @endphp
                         <tr>
                             <td class="font-semibold">{{ $medicament->nom }}</td>
                             <td class="num">{{ $medicament->stock }}</td>
@@ -134,12 +132,11 @@
                                 {{ $medicament->date_expiration->format('m / Y') }}
                             </td>
                             <td class="text-right">
-                                @if ($medicament->stock === 0)
-                                    <span class="pill-danger">Rupture</span>
-                                @elseif ($medicament->stock <= 5)
-                                    <span class="pill-warn">Stock faible</span>
+                                {{-- le produit est là pour son stock, sinon pour sa date --}}
+                                @if ($medicament->statut_stock === \App\Enums\StatutStock::Ok)
+                                    <span class="pill-warn">Expire &lt; {{ \App\Models\Medicament::FENETRE_EXPIRATION_JOURS }}j</span>
                                 @else
-                                    <span class="pill-warn">Expire &lt; 30j</span>
+                                    <x-pastille-stock :medicament="$medicament" format="libelle" />
                                 @endif
                             </td>
                         </tr>

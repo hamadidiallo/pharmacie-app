@@ -9,9 +9,13 @@ use Illuminate\Support\Facades\Route;
 Route::controller(AuthController::class)->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('/', 'showLoginForm')->name('auth.login');
-        Route::post('/', 'login');
         Route::get('/register', 'showRegisterForm')->name('auth.register');
-        Route::post('/register', 'register');
+
+        // limite les tentatives : sans cela la force brute est libre
+        Route::middleware('throttle:5,1')->group(function () {
+            Route::post('/', 'login');
+            Route::post('/register', 'register');
+        });
     });
     Route::delete('/logout', 'logout')->name('auth.logout')->middleware('auth');
 });
@@ -39,7 +43,6 @@ Route::controller(VenteController::class)->middleware('auth')->group(function ()
 
 Route::controller(MedicamentController::class)->middleware('auth')->group(function () {
     Route::get('/liste', 'index')->name('medicaments.index');
-    Route::get('/medicaments/stocks', 'stocks')->name('medicaments.stocks');
     Route::get('/create', 'create')->name('medicament.create');
     Route::post('/create', 'store')->name('medicament.store');
     Route::put('/medicaments/{medicament}', 'update')->name('medicament.update');

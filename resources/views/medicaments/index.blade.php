@@ -82,23 +82,13 @@
                             </td>
 
                             <td>
-                                @if ($medicament->stock === 0)
-                                    <span class="pill-danger num" id="stock-{{ $medicament->id }}">0 · rupture</span>
-                                @elseif ($medicament->stock <= 5)
-                                    <span class="pill-warn num" id="stock-{{ $medicament->id }}">
-                                        {{ $medicament->stock }} · faible
-                                    </span>
-                                @else
-                                    <span class="pill-ok num" id="stock-{{ $medicament->id }}">
-                                        {{ $medicament->stock }}
-                                    </span>
-                                @endif
+                                <x-pastille-stock :medicament="$medicament" />
                             </td>
 
                             <td @class([
                                 'num whitespace-nowrap',
-                                'text-danger-fg' => $medicament->date_expiration->lt(now()->addDays(30)),
-                                'text-slate-ink' => !$medicament->date_expiration->lt(now()->addDays(30)),
+                                'text-danger-fg' => $medicament->expireBientot(),
+                                'text-slate-ink' => !$medicament->expireBientot(),
                             ])>
                                 {{ $medicament->date_expiration->format('m / Y') }}
                             </td>
@@ -205,21 +195,3 @@
     @endforeach
 
 @endsection
-
-@push('scripts')
-    <script>
-        // Rafraîchit les pastilles de stock sans recharger la page.
-        fetch('/medicaments/stocks')
-            .then(reponse => reponse.json())
-            .then(medicaments => {
-                medicaments.forEach(medicament => {
-                    const pastille = document.getElementById('stock-' + medicament.id);
-                    if (!pastille) return;
-                    pastille.textContent = medicament.stock === 0 ?
-                        '0 · rupture' :
-                        medicament.stock <= 5 ? medicament.stock + ' · faible' : medicament.stock;
-                });
-            })
-            .catch(() => {});
-    </script>
-@endpush

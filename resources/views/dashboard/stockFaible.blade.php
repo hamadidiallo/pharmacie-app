@@ -34,7 +34,7 @@
                             </td>
                             <td class="num text-slate-ink">{{ $medicament->date_expiration->format('m / Y') }}</td>
                             <td class="text-right">
-                                <span class="pill-warn num">{{ $medicament->stock }}</span>
+                                <x-pastille-stock :medicament="$medicament" format="nombre" />
                             </td>
                         </tr>
                     @empty

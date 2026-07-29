@@ -32,6 +32,8 @@ class Vente extends Model
             'medicament__vente'
         )
             ->using(Medicament_Vente::class)
+            // un produit archivé doit rester visible sur les tickets déjà émis
+            ->withTrashed()
             ->withPivot('quantite', 'prix', 'sous_total')
             ->withTimestamps();
     }

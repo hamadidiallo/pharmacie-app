@@ -22,10 +22,10 @@ class MedicamentController extends Controller
 
         $medicaments = Medicament::query()
             ->when($recherche !== '', fn ($requete) => $requete->where('nom', 'LIKE', '%' . $recherche . '%'))
-            ->when($filtre === 'stock', fn ($requete) => $requete->where('stock', '>', 5))
-            ->when($filtre === 'faible', fn ($requete) => $requete->where('stock', '>', 0)->where('stock', '<=', 5))
-            ->when($filtre === 'rupture', fn ($requete) => $requete->where('stock', 0))
-            ->when($filtre === 'expire', fn ($requete) => $requete->whereBetween('date_expiration', [now(), now()->addDays(30)]))
+            ->when($filtre === 'stock', fn ($requete) => $requete->enStock())
+            ->when($filtre === 'faible', fn ($requete) => $requete->stockFaible())
+            ->when($filtre === 'rupture', fn ($requete) => $requete->enRupture())
+            ->when($filtre === 'expire', fn ($requete) => $requete->procheExpiration())
             ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString();
@@ -36,9 +36,9 @@ class MedicamentController extends Controller
             'recherche' => $recherche,
             'compteurs' => [
                 'tous' => Medicament::count(),
-                'faible' => Medicament::where('stock', '>', 0)->where('stock', '<=', 5)->count(),
-                'rupture' => Medicament::where('stock', 0)->count(),
-                'expire' => Medicament::whereBetween('date_expiration', [now(), now()->addDays(30)])->count(),
+                'faible' => Medicament::stockFaible()->count(),
+                'rupture' => Medicament::enRupture()->count(),
+                'expire' => Medicament::procheExpiration()->count(),
             ],
         ]);
     }
@@ -101,12 +101,10 @@ class MedicamentController extends Controller
      */
     public function delete(Medicament $medicament)
     {
+        // archivage : les ventes déjà enregistrées gardent leurs lignes intactes
         $medicament->delete();
-        return to_route('medicaments.index')->with('alert', 'MEDICAMENT SUPPRIME AVEC SUCCESS');
-    }
-    // STOCKS MEDICAMENT METHODE
-    public function stocks()
-    {
-        return response()->json( Medicament::select('id', 'stock')->get());
+
+        return to_route('medicaments.index')
+            ->with('alert', $medicament->nom . ' a été retiré du catalogue. Les ventes passées sont conservées.');
     }
 }

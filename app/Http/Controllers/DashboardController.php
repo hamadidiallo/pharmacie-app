@@ -33,11 +33,9 @@ class DashboardController extends Controller
         $totalMedicaments = Medicament::count();
 
         // ALERTES : ce qui demande une action au comptoir
-        $ruptures = Medicament::where('stock', 0)->orderBy('nom')->get(['id', 'nom']);
-        $stockFaible = Medicament::where('stock', '>', 0)->where('stock', '<=', 5)
-            ->orderBy('stock')->get(['id', 'nom']);
-        $expirations = Medicament::whereBetween('date_expiration', [now(), now()->addDays(30)])
-            ->orderBy('date_expiration')->get(['id', 'nom']);
+        $ruptures = Medicament::enRupture()->orderBy('nom')->get(['id', 'nom']);
+        $stockFaible = Medicament::stockFaible()->orderBy('stock')->get(['id', 'nom']);
+        $expirations = Medicament::procheExpiration()->orderBy('date_expiration')->get(['id', 'nom']);
 
         return view('dashboard.index', [
             'venteJour' => $venteJour,
@@ -78,9 +76,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Produits demandant une action : rupture, stock faible ou expiration proche
-        $surveillance = Medicament::where('stock', '<=', 5)
-            ->orWhereBetween('date_expiration', [now(), now()->addDays(30)])
+        $surveillance = Medicament::aSurveiller()
             ->orderBy('stock')
             ->limit(15)
             ->get();
@@ -99,22 +95,19 @@ class DashboardController extends Controller
     // METHODE STOCK FAIBLE
     public function stockFaible()
     {
-        $stockFaible = Medicament::where('stock', '>', 0)->where('stock', '<=', 5)->get();
+        $stockFaible = Medicament::stockFaible()->orderBy('stock')->get();
         return view('dashboard.stockFaible', compact('stockFaible'));
     }
 
     public function ruptureStock()
     {
-        $ruptureStock = Medicament::where('stock', 0)->get();
+        $ruptureStock = Medicament::enRupture()->orderBy('nom')->get();
         return view('dashboard.ruptureStock', compact('ruptureStock'));
     }
 
     public function expirationProche()
     {
-        $expires = Medicament::whereBetween('date_expiration', [
-            now(),
-            now()->addDays(30)
-        ])->get();
+        $expires = Medicament::procheExpiration()->orderBy('date_expiration')->get();
         return view('dashboard.expire', compact('expires'));
     }
 
