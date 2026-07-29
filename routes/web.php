@@ -37,12 +37,12 @@ Route::controller(VenteController::class)->middleware('auth')->group(function ()
     Route::get('/ventes/{vente}', 'show')->name('ventes.show');
     Route::delete('/ventes/{vente}', 'destroy')->name('ventes.destroy');
     Route::get('/ventes/{vente}/pdf', 'pdf')->name('ventes.pdf');
-    // recherche de médicaments utilisée par l'écran de vente
-    Route::get('/medicaments/search', 'search')->name('medicament.search');
 });
 
 Route::controller(MedicamentController::class)->middleware('auth')->group(function () {
     Route::get('/liste', 'index')->name('medicaments.index');
+    // recherche utilisée par l'écran de vente
+    Route::get('/medicaments/search', 'search')->name('medicament.search');
     Route::get('/create', 'create')->name('medicament.create');
     Route::post('/create', 'store')->name('medicament.store');
     Route::put('/medicaments/{medicament}', 'update')->name('medicament.update');

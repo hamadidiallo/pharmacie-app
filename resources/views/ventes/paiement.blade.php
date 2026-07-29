@@ -11,7 +11,7 @@
     </a>
     <div class="text-base font-bold">Paiement</div>
     <span class="ml-3.5 hidden text-[13px] text-faint sm:inline">
-        {{ count($lignes) }} {{ count($lignes) > 1 ? 'articles' : 'article' }}
+        {{ $panier->nombreArticles() }} {{ $panier->nombreArticles() > 1 ? 'articles' : 'article' }}
     </span>
 @endsection
 
@@ -24,6 +24,7 @@
             'mobile_money' => '<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/>',
             'carte' => '<rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/>',
         ];
+        $total = $panier->total();
         // suggestions de montant reçu : le compte juste, puis les coupures au-dessus
         $suggestions = collect([$total, ceil($total / 500) * 500, ceil($total / 1000) * 1000, ceil($total / 5000) * 5000])
             ->unique()
@@ -42,16 +43,16 @@
 
             <div class="mb-4 text-sm font-bold">Récapitulatif</div>
 
-            @foreach ($lignes as $ligne)
+            @foreach ($panier->lignes() as $ligne)
                 <div class="flex items-center gap-3 border-b border-[#F1F5F3] py-2.5 last:border-0">
                     <div class="min-w-0 flex-1">
-                        <div class="truncate text-sm font-semibold">{{ $ligne['medicament']->nom }}</div>
+                        <div class="truncate text-sm font-semibold">{{ $ligne->medicament->nom }}</div>
                         <div class="num text-xs text-faint">
-                            {{ $ligne['quantite'] }} × {{ number_format($ligne['prix'], 0, ',', ' ') }} FCFA
+                            {{ $ligne->quantite }} × {{ number_format($ligne->prix(), 0, ',', ' ') }} FCFA
                         </div>
                     </div>
                     <div class="num text-sm font-semibold">
-                        {{ number_format($ligne['sous_total'], 0, ',', ' ') }}
+                        {{ number_format($ligne->sousTotal(), 0, ',', ' ') }}
                     </div>
                 </div>
             @endforeach

@@ -43,6 +43,18 @@ class MedicamentController extends Controller
         ]);
     }
 
+    /** Recherche utilisée par l'écran de vente. */
+    public function search(Request $request)
+    {
+        $medicaments = Medicament::select('id', 'nom', 'prix', 'stock', 'description')
+            ->where('nom', 'LIKE', '%' . (string) $request->q . '%')
+            ->orderBy('nom')
+            ->limit(20)
+            ->get();
+
+        return response()->json($medicaments);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
