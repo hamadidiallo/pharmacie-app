@@ -20,31 +20,46 @@ Route::controller(AuthController::class)->group(function () {
     Route::delete('/logout', 'logout')->name('auth.logout')->middleware('auth');
 });
 
-Route::controller(DashboardController::class)->middleware('auth')->group(function () {
-    Route::get('/dashboard', 'index')->name('dashboard');
-    Route::get('/statistiques', 'statistiques')->name('dashboard.statistiques');
-    Route::get('/stock', 'stockFaible')->name('dashboard.stockFaible');
-    Route::get('/rupture', 'ruptureStock')->name('dashboard.ruptureStock');
-    Route::get('/expire', 'expirationProche')->name('dashboard.expire');
-});
+Route::middleware('auth')->group(function () {
 
-Route::controller(VenteController::class)->middleware('auth')->group(function () {
-    Route::get('/ventes', 'index')->name('ventes.index');
-    Route::get('/ventes/create', 'create')->name('ventes.create');
-    Route::post('/ventes/panier', 'panier')->name('ventes.panier');
-    Route::get('/ventes/paiement', 'paiement')->name('ventes.paiement');
-    Route::post('/ventes/store', 'store')->name('ventes.store');
-    Route::get('/ventes/{vente}', 'show')->name('ventes.show');
-    Route::delete('/ventes/{vente}', 'destroy')->name('ventes.destroy');
-    Route::get('/ventes/{vente}/pdf', 'pdf')->name('ventes.pdf');
-});
+    Route::controller(DashboardController::class)->group(function () {
+        Route::get('/dashboard', 'index')->name('dashboard');
+        Route::get('/statistiques', 'statistiques')->name('dashboard.statistiques');
+    });
 
-Route::controller(MedicamentController::class)->middleware('auth')->group(function () {
-    Route::get('/liste', 'index')->name('medicaments.index');
-    // recherche utilisée par l'écran de vente
-    Route::get('/medicaments/search', 'search')->name('medicament.search');
-    Route::get('/create', 'create')->name('medicament.create');
-    Route::post('/create', 'store')->name('medicament.store');
-    Route::put('/medicaments/{medicament}', 'update')->name('medicament.update');
-    Route::delete('/medicaments/{medicament}', 'delete')->name('medicament.delete');
+    /*
+     * Les anciennes pages d'alerte faisaient doublon avec la liste filtrée, qui
+     * offre en plus la recherche, la pagination et les actions. Les URL sont
+     * conservées pour ne casser aucun signet ni lien existant.
+     */
+    Route::redirect('/stock', '/medicaments?filtre=faible');
+    Route::redirect('/rupture', '/medicaments?filtre=rupture');
+    Route::redirect('/expire', '/medicaments?filtre=expire');
+
+    Route::controller(MedicamentController::class)
+        ->prefix('medicaments')
+        ->name('medicaments.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            // avant /{medicament} pour que « search » ne soit pas pris pour un identifiant
+            Route::get('/search', 'search')->name('search');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::put('/{medicament}', 'update')->name('update');
+            Route::delete('/{medicament}', 'destroy')->name('destroy');
+        });
+
+    Route::controller(VenteController::class)
+        ->prefix('ventes')
+        ->name('ventes.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::get('/paiement', 'paiement')->name('paiement');
+            Route::post('/panier', 'panier')->name('panier');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{vente}', 'show')->name('show');
+            Route::delete('/{vente}', 'destroy')->name('destroy');
+            Route::get('/{vente}/pdf', 'pdf')->name('pdf');
+        });
 });

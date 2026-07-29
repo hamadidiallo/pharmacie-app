@@ -23,7 +23,7 @@
                 d'expiration — les quantités sont cumulées au lot existant plutôt que dupliquées.
             </p>
 
-            <form action="{{ route('medicament.store') }}" method="post">
+            <form action="{{ route('medicaments.store') }}" method="post">
 
                 @csrf
 

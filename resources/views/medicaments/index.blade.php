@@ -12,7 +12,7 @@
             class="field-input h-9 w-40 sm:w-[300px]">
     </form>
 
-    <a href="{{ route('medicament.create') }}" class="btn-primary">
+    <a href="{{ route('medicaments.create') }}" class="btn-primary">
         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
             stroke-linecap="round">
             <path d="M12 5v14M5 12h14" />
@@ -126,7 +126,7 @@
                                         class="font-semibold text-brand-500">Tout afficher</a>
                                 @else
                                     Aucun médicament pour l'instant.
-                                    <a href="{{ route('medicament.create') }}" class="font-semibold text-brand-500">
+                                    <a href="{{ route('medicaments.create') }}" class="font-semibold text-brand-500">
                                         Ajoutez le premier produit
                                     </a>
                                 @endif
@@ -183,7 +183,7 @@
 
             <div class="flex justify-end gap-2 border-t border-hairline px-5 py-4">
                 <button type="button" data-dialog-close class="btn-ghost">Annuler</button>
-                <form action="{{ route('medicament.delete', $medicament) }}" method="POST">
+                <form action="{{ route('medicaments.destroy', $medicament) }}" method="POST">
                     @csrf
                     @method('delete')
                     <button type="submit" class="btn bg-danger-fg text-white hover:bg-danger-text">Supprimer</button>

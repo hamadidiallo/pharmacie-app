@@ -22,23 +22,23 @@
         $maxCa = max(array_column($serieCa, 'total')) ?: 1;
         $alertes = [
             [
-                'route' => 'dashboard.ruptureStock',
+                'filtre' => 'rupture',
                 'titre' => 'Rupture de stock',
                 'produits' => $ruptures,
                 'ton' => 'danger',
                 'icone' => '<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>',
             ],
             [
-                'route' => 'dashboard.stockFaible',
-                'titre' => 'Stock faible (≤ 5)',
+                'filtre' => 'faible',
+                'titre' => 'Stock faible (≤ ' . \App\Models\Medicament::SEUIL_ALERTE . ')',
                 'produits' => $stockFaible,
                 'ton' => 'warning',
                 'icone' =>
                     '<path d="M10.3 3.2 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/>',
             ],
             [
-                'route' => 'dashboard.expire',
-                'titre' => 'Expiration < 30 j',
+                'filtre' => 'expire',
+                'titre' => 'Expiration < ' . \App\Models\Medicament::FENETRE_EXPIRATION_JOURS . ' j',
                 'produits' => $expirations,
                 'ton' => 'warning',
                 'icone' => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
@@ -142,7 +142,7 @@
                         $noms = $alerte['produits']->take(2)->pluck('nom')->implode(' · ');
                         $reste = $nombre - min($nombre, 2);
                     @endphp
-                    <a href="{{ route($alerte['route']) }}"
+                    <a href="{{ route('medicaments.index', ['filtre' => $alerte['filtre']]) }}"
                         @class([
                             'flex gap-3 rounded-lg border p-3 transition-colors',
                             'border-danger-border bg-danger-bg hover:bg-danger-border/60' =>

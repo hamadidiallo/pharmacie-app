@@ -111,7 +111,7 @@ class MedicamentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function delete(Medicament $medicament)
+    public function destroy(Medicament $medicament)
     {
         // archivage : les ventes déjà enregistrées gardent leurs lignes intactes
         $medicament->delete();

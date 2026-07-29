@@ -1,5 +1,5 @@
 {{-- partiel inclus dans la modale de modification de medicaments/index --}}
-<form action="{{ route('medicament.update', $medicament) }}" method="post">
+<form action="{{ route('medicaments.update', $medicament) }}" method="post">
 
     @method('put')
     @csrf

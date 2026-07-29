@@ -17,13 +17,21 @@ test('les pages authentifiées répondent', function (string $route) {
 })->with([
     'dashboard',
     'dashboard.statistiques',
-    'dashboard.stockFaible',
-    'dashboard.ruptureStock',
-    'dashboard.expire',
     'medicaments.index',
-    'medicament.create',
+    'medicaments.create',
     'ventes.index',
     'ventes.create',
+]);
+
+test('les anciennes URL des pages d\'alerte redirigent vers la liste filtrée', function (string $ancienne, string $filtre) {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->get($ancienne)
+        ->assertRedirect('/medicaments?filtre=' . $filtre);
+})->with([
+    ['/rupture', 'rupture'],
+    ['/stock', 'faible'],
+    ['/expire', 'expire'],
 ]);
 
 test('les statistiques acceptent les trois périodes', function (string $periode) {
@@ -86,7 +94,7 @@ test('la liste des médicaments affiche le formulaire de modification et le menu
     $html = $this->actingAs($user)->get(route('medicaments.index'))
         ->assertOk()
         // le partiel d'édition est bien inclus dans chaque modale
-        ->assertSee(route('medicament.update', $medicaments->first()), false)
+        ->assertSee(route('medicaments.update', $medicaments->first()), false)
         ->getContent();
 
     // le layout et la barre latérale ne doivent être rendus qu'une seule fois :

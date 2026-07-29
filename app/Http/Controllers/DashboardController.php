@@ -92,25 +92,6 @@ class DashboardController extends Controller
         ]);
     }
 
-    // METHODE STOCK FAIBLE
-    public function stockFaible()
-    {
-        $stockFaible = Medicament::stockFaible()->orderBy('stock')->get();
-        return view('dashboard.stockFaible', compact('stockFaible'));
-    }
-
-    public function ruptureStock()
-    {
-        $ruptureStock = Medicament::enRupture()->orderBy('nom')->get();
-        return view('dashboard.ruptureStock', compact('ruptureStock'));
-    }
-
-    public function expirationProche()
-    {
-        $expires = Medicament::procheExpiration()->orderBy('date_expiration')->get();
-        return view('dashboard.expire', compact('expires'));
-    }
-
     /**
      * Chiffre d'affaires jour par jour sur les N derniers jours, aujourd'hui inclus.
      * Les jours sans vente sont présents avec un total à zéro.

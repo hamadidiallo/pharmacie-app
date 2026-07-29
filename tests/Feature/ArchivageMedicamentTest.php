@@ -25,7 +25,7 @@ test('retirer un médicament du catalogue préserve les ventes passées', functi
         ->and($vente->medicaments)->toHaveCount(1);
 
     // le pharmacien retire le produit du catalogue
-    $this->delete(route('medicament.delete', $medicament))->assertRedirect();
+    $this->delete(route('medicaments.destroy', $medicament))->assertRedirect();
 
     $vente->refresh()->load('medicaments');
 
@@ -67,7 +67,7 @@ test('un médicament archivé disparaît du catalogue et ne peut plus être vend
 
     // absent de la liste et de la recherche du comptoir
     $this->get(route('medicaments.index'))->assertOk()->assertDontSee('Sirop retiré');
-    $this->getJson(route('medicament.search', ['q' => 'Sirop']))->assertOk()->assertJsonCount(0);
+    $this->getJson(route('medicaments.search', ['q' => 'Sirop']))->assertOk()->assertJsonCount(0);
 
     // et refusé à la mise au panier
     $this->postJson(route('ventes.panier'), [

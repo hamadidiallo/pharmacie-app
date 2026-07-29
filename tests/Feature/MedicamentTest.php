@@ -5,13 +5,13 @@ use App\Models\User;
 
 test('les écrans médicaments exigent une connexion', function () {
     $this->get(route('medicaments.index'))->assertRedirect(route('auth.login'));
-    $this->get(route('medicament.create'))->assertRedirect(route('auth.login'));
+    $this->get(route('medicaments.create'))->assertRedirect(route('auth.login'));
 });
 
 test('un médicament est créé et rattaché à son auteur', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user)->post(route('medicament.store'), [
+    $this->actingAs($user)->post(route('medicaments.store'), [
         'nom' => 'Paracétamol 500mg',
         'prix' => 1500,
         'stock' => 20,
@@ -37,8 +37,8 @@ test('un lot identique cumule le stock au lieu de créer un doublon', function (
         'description' => 'Anti-inflammatoire',
     ];
 
-    $this->actingAs($user)->post(route('medicament.store'), $donnees);
-    $this->actingAs($user)->post(route('medicament.store'), $donnees);
+    $this->actingAs($user)->post(route('medicaments.store'), $donnees);
+    $this->actingAs($user)->post(route('medicaments.store'), $donnees);
 
     expect(Medicament::where('nom', 'Ibuprofène 400mg')->count())->toBe(1)
         ->and(Medicament::firstWhere('nom', 'Ibuprofène 400mg')->stock)->toBe(20);
@@ -49,7 +49,7 @@ test('un médicament peut être supprimé', function () {
     $medicament = Medicament::factory()->create();
 
     $this->actingAs($user)
-        ->delete(route('medicament.delete', $medicament))
+        ->delete(route('medicaments.destroy', $medicament))
         ->assertRedirect(route('medicaments.index'));
 
     expect(Medicament::find($medicament->id))->toBeNull();
