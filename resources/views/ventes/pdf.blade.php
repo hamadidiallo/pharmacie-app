@@ -72,10 +72,26 @@
     </table>
 
     <p class="total">
-        TOTAL : {{ number_format($vente->total, 0, ',', ' ') }} FCFA
+        TOTAL BRUT : {{ number_format($vente->total, 0, ',', ' ') }} FCFA
     </p>
 
-    <p><strong>Paiement :</strong> {{ $vente->libelleModePaiement() }}</p>
+    @if($vente->estPriseEnCharge())
+        <div style="background-color: #fef3c7; border: 1px dashed #d97706; padding: 6px; margin-top: 5px; font-size: 11px;">
+            <p style="margin: 0;"><strong>Prise en charge {{ $vente->assurance?->code ?? 'Assurance' }} ({{ (int)$vente->taux_couverture }}%) :</strong> -{{ number_format($vente->part_assurance, 0, ',', ' ') }} FCFA</p>
+            <p style="margin: 3px 0 0 0; font-size: 12px; font-weight: bold; color: #0f766e;"><strong>NET PAYÉ PAR L'ASSURÉ :</strong> {{ number_format($vente->part_patient, 0, ',', ' ') }} FCFA</p>
+            <p style="margin: 3px 0 0 0; font-size: 10px; color: #475569;">Matricule : {{ $vente->matricule_assure }} {{ $vente->nom_assure ? '— ' . $vente->nom_assure : '' }}</p>
+        </div>
+    @endif
+
+    @if($vente->ordonnancierLignes->isNotEmpty())
+        <div style="background-color: #f3e8ff; border: 1px dashed #9333ea; padding: 5px; margin-top: 5px; font-size: 10px;">
+            <p style="margin: 0;"><strong>Prescription Réglementaire :</strong></p>
+            <p style="margin: 2px 0 0 0;">Dr {{ $vente->ordonnancierLignes->first()->nom_prescripteur }} • Patient : {{ $vente->ordonnancierLignes->first()->nom_patient }}</p>
+            <p style="margin: 2px 0 0 0;">N° Ordonnancier : {{ $vente->ordonnancierLignes->pluck('numero_ordonnancier')->join(', ') }}</p>
+        </div>
+    @endif
+
+    <p style="margin-top: 10px;"><strong>Paiement :</strong> {{ $vente->libelleModePaiement() }}</p>
 
     @if ($vente->montant_recu !== null)
         <p>

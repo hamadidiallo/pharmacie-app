@@ -23,11 +23,19 @@ class StoreMedicamentRequest extends FormRequest
     public function rules(): array
     {
         return [
-             'nom' => 'required',
-             'prix' => 'required|numeric',
-             'stock' => 'required|numeric|min:1',
+             'nom' => 'required|string|max:191',
+             'dci' => 'nullable|string|max:150',
+             'code_barre' => 'nullable|string|max:60',
+             'forme' => 'nullable|string|max:80',
+             'dosage' => 'nullable|string|max:80',
+             'tableau' => 'nullable|string',
+             'ordonnance_requise' => 'nullable|boolean',
+             'prix' => 'required|numeric|min:0',
+             'stock' => 'required|numeric|min:0',
+             'stock_securite' => 'nullable|integer|min:0',
+             'numero_lot' => 'nullable|string|max:80',
              'date_expiration' => 'required|date',
-             'description' => 'required'
+             'description' => 'nullable|string',
         ];
     }
     public function messages(): array 

@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Caisse\Encaissement;
 use App\Caisse\Panier;
 use App\Exceptions\MontantInsuffisantException;
 use App\Exceptions\VenteException;
 use App\Http\Requests\PaiementRequest;
 use App\Models\Vente;
+use App\Services\Caisse\AnnulerVenteAction;
+use App\Services\Caisse\EnregistrerVenteAction;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class VenteController extends Controller
 {
@@ -21,11 +21,11 @@ class VenteController extends Controller
     public function create()
     {
         try {
-            // le panier déjà en session est réinjecté dans l'écran, pour qu'un
+            // Le panier déjà en session est réinjecté dans l'écran, pour qu'un
             // retour depuis le paiement ne perde pas le travail du comptoir
             $panier = $this->panierEnSession();
         } catch (VenteException) {
-            // un produit du panier a été archivé entre-temps : on repart à vide
+            // Un produit du panier a été archivé entre-temps : on repart à vide
             session()->forget(self::CLE_PANIER);
             $panier = Panier::avec([]);
         }
@@ -66,13 +66,16 @@ class VenteController extends Controller
             return to_route('ventes.create')->with('alert', $e->getMessage());
         }
 
+        $assurances = \App\Models\Assurance::actif()->orderBy('nom')->get();
+
         return view('ventes.paiement', [
             'panier' => $panier,
             'modes' => Vente::MODES_PAIEMENT,
+            'assurances' => $assurances,
         ]);
     }
 
-    public function store(PaiementRequest $request)
+    public function store(PaiementRequest $request, EnregistrerVenteAction $enregistrerVente)
     {
         $quantites = session(self::CLE_PANIER, []);
 
@@ -80,40 +83,37 @@ class VenteController extends Controller
             return to_route('ventes.create')->with('alert', 'Votre panier est vide.');
         }
 
+        $donneesTiersPayant = [
+            'avec_assurance' => $request->boolean('avec_assurance'),
+            'assurance_id' => $request->input('assurance_id'),
+            'matricule_assure' => $request->input('matricule_assure'),
+            'nom_assure' => $request->input('nom_assure'),
+            'taux_couverture' => $request->input('taux_couverture'),
+        ];
+
+        $donneesOrdonnance = [
+            'nom_prescripteur' => $request->input('nom_prescripteur'),
+            'specialite_prescripteur' => $request->input('specialite_prescripteur'),
+            'nom_patient' => $request->input('nom_patient'),
+            'age_patient' => $request->input('age_patient'),
+            'date_prescription' => $request->input('date_prescription'),
+            'posologie' => $request->input('posologie'),
+            'notes' => $request->input('notes_ordonnance'),
+        ];
+
         try {
-            $vente = DB::transaction(function () use ($quantites, $request) {
-
-                $panier = Panier::depuisQuantites($quantites, verrouiller: true);
-
-                $panier->controlerStock();
-
-                $encaissement = Encaissement::pour(
-                    $request->validated('mode_paiement'),
-                    $panier->total(),
-                    $request->validated('montant_recu')
-                );
-
-                $vente = Vente::create([
-                    'total' => $panier->total(),
-                    'date_vente' => now(),
-                    'user_id' => Auth::id(),
-                    ...$encaissement->attributs(),
-                ]);
-
-                $vente->medicaments()->attach($panier->attributsPivot());
-
-                foreach ($panier->lignes() as $ligne) {
-                    $ligne->medicament->decrement('stock', $ligne->quantite);
-                }
-
-                return $vente;
-            });
+            $vente = $enregistrerVente->execute(
+                quantitesPanier: $quantites,
+                modePaiement: $request->validated('mode_paiement'),
+                montantRecu: $request->validated('montant_recu'),
+                userId: Auth::id(),
+                donneesTiersPayant: $donneesTiersPayant,
+                donneesOrdonnance: $donneesOrdonnance
+            );
         } catch (MontantInsuffisantException $e) {
-            // erreur de saisie : on la remonte sur le champ concerné
             return back()->withErrors([MontantInsuffisantException::CHAMP => $e->getMessage()])->withInput();
         } catch (VenteException $e) {
-            // le stock a bougé depuis l'écran de paiement
-            return back()->with('alert', $e->getMessage());
+            return back()->with('alert', $e->getMessage())->withInput();
         }
 
         session()->forget(self::CLE_PANIER);
@@ -144,22 +144,9 @@ class VenteController extends Controller
         return view('ventes.index', compact('ventes'));
     }
 
-    // VENTES SUPPRESSIONS METHODES
-    public function destroy(Vente $vente)
+    public function destroy(Vente $vente, AnnulerVenteAction $annulerVente)
     {
-        DB::transaction(function () use ($vente) {
-
-            // remettre stock
-            foreach ($vente->medicaments as $medicament) {
-                $medicament->increment('stock', $medicament->pivot->quantite);
-            }
-
-            // supprimer pivot
-            $vente->medicaments()->detach();
-
-            // supprimer vente
-            $vente->delete();
-        });
+        $annulerVente->execute($vente);
 
         return redirect()
             ->route('ventes.index')->with('alert', 'Vente supprimée avec succès et stock mis à jour');

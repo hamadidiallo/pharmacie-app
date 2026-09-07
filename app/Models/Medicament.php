@@ -21,8 +21,16 @@ class Medicament extends Model
 
     protected $fillable = [
         'nom',
+        'dci',
+        'code_barre',
+        'forme',
+        'dosage',
+        'tableau',
+        'ordonnance_requise',
         'prix',
         'stock',
+        'stock_securite',
+        'stock_alerte',
         'date_expiration',
         'description',
         'user_id',
@@ -30,7 +38,43 @@ class Medicament extends Model
 
     protected $casts = [
         'date_expiration' => 'date',
+        'tableau' => \App\Enums\TableauReglementaire::class,
+        'ordonnance_requise' => 'boolean',
+        'stock_securite' => 'integer',
+        'stock_alerte' => 'integer',
     ];
+
+    public function lots()
+    {
+        return $this->hasMany(MedicamentLot::class);
+    }
+
+    public function lotsActifs()
+    {
+        return $this->hasMany(MedicamentLot::class)
+            ->where('statut', \App\Enums\StatutLot::Actif)
+            ->where('quantite_actuelle', '>', 0)
+            ->where('date_expiration', '>', now())
+            ->orderBy('date_expiration', 'asc');
+    }
+
+    public function prochainLot(): ?MedicamentLot
+    {
+        return $this->lotsActifs()->first();
+    }
+
+    /**
+     * Recalcule le stock total disponible à la vente d'après les lots actifs.
+     */
+    public function synchroniserStockDepuisLots(): void
+    {
+        $totalActif = $this->lots()
+            ->where('statut', \App\Enums\StatutLot::Actif)
+            ->where('date_expiration', '>', now())
+            ->sum('quantite_actuelle');
+
+        $this->update(['stock' => $totalActif]);
+    }
 
     public function ventes()
     {

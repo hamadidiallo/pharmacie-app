@@ -145,4 +145,24 @@ final class Panier
     {
         return array_values(array_map(fn (LignePanier $ligne) => $ligne->pourLeNavigateur(), $this->lignes));
     }
+
+    public function contientMedicamentSousOrdonnance(): bool
+    {
+        foreach ($this->lignes as $ligne) {
+            $m = $ligne->medicament;
+            if ($m->ordonnance_requise || ($m->tableau instanceof \App\Enums\TableauReglementaire && $m->tableau->requiertOrdonnance())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** @return array<int,LignePanier> */
+    public function lignesSousOrdonnance(): array
+    {
+        return array_filter($this->lignes, function (LignePanier $ligne) {
+            $m = $ligne->medicament;
+            return $m->ordonnance_requise || ($m->tableau instanceof \App\Enums\TableauReglementaire && $m->tableau->requiertOrdonnance());
+        });
+    }
 }

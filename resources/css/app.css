@@ -6,61 +6,63 @@
 @source '../**/*.js';
 
 /*
- * GESTA PHARM — design tokens
- * Palette santé (vert), thème clair, ton clinique.
- * Voir « Tableau de bord pharmacie/ecrans-tailwind/tokens ».
+ * GESTA PHARM — Modern Design System
+ * Palette santé premium (Émeraude & Ardoise), thème lumineux, touches cliniques.
  */
 @theme {
-    --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-sans: 'IBM Plex Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'IBM Plex Mono', monospace;
 
-    /* Vert santé */
-    --color-brand-50: #e7f5f0;
-    --color-brand-500: #0f8a6b;
-    --color-brand-600: #0b6b52;
-    --color-brand-900: #0c2a22;
-    --color-leaf: #16a37d;
-    --color-mint: #3ebe9a;
+    /* Teintes Primaires Santé */
+    --color-brand-50: #ecfdf5;
+    --color-brand-100: #d1fae5;
+    --color-brand-200: #a7f3d0;
+    --color-brand-500: #10b981;
+    --color-brand-600: #059669;
+    --color-brand-700: #047857;
+    --color-brand-900: #064e3b;
+    --color-leaf: #059669;
+    --color-mint: #34d399;
 
-    /* Surfaces / neutres */
-    --color-canvas: #ebf0ee;
-    --color-surface: #f4f7f6;
-    --color-line: #e2eae7;
-    --color-hairline: #eef2f0;
-    --color-ink: #16241f;
-    --color-muted: #7c8a85;
-    --color-faint: #9aa6a2;
-    --color-slate-ink: #3a4a44;
+    /* Surfaces & Neutres */
+    --color-canvas: #f8fafc;
+    --color-surface: #f1f5f9;
+    --color-line: #e2e8f0;
+    --color-hairline: #f1f5f9;
+    --color-ink: #0f172a;
+    --color-muted: #64748b;
+    --color-faint: #94a3b8;
+    --color-slate-ink: #334155;
 
-    /* Sidebar */
-    --color-sidebar-text: #cfe3dc;
-    --color-sidebar-muted: #6fa394;
-    --color-sidebar-label: #5c8577;
-    --color-sidebar-card: #123a30;
+    /* Sidebar Sombre & Élégante */
+    --color-sidebar-bg: #0b1513;
+    --color-sidebar-card: #132420;
+    --color-sidebar-text: #e2e8f0;
+    --color-sidebar-muted: #839d95;
+    --color-sidebar-label: #527369;
 
-    /* Statuts */
-    --color-danger-bg: #fcecea;
-    --color-danger-border: #f3cfc9;
-    --color-danger-fg: #c1352b;
-    --color-danger-text: #7a241c;
-    --color-warning-bg: #fdf3e0;
-    --color-warning-border: #f1ddb4;
-    --color-warning-fg: #b47500;
-    --color-warning-text: #8a5a00;
-    --color-success-bg: #e7f5f0;
-    --color-success-fg: #0b6b52;
+    /* Statuts & Alertes */
+    --color-danger-bg: #fef2f2;
+    --color-danger-border: #fecaca;
+    --color-danger-fg: #ef4444;
+    --color-danger-text: #b91c1c;
+
+    --color-warning-bg: #fffbeb;
+    --color-warning-border: #fde68a;
+    --color-warning-fg: #f59e0b;
+    --color-warning-text: #b45309;
+
+    --color-success-bg: #ecfdf5;
+    --color-success-fg: #059669;
 
     /* Rayons */
-    --radius-card: 13px;
-    --radius-field: 11px;
-    --radius-pill: 20px;
-
-    /* Ombres */
-    --shadow-card: 0 10px 30px -18px rgb(11 54 42 / 0.28);
+    --radius-card: 18px;
+    --radius-field: 12px;
+    --radius-pill: 9999px;
 
     /* Layout */
-    --spacing-sidebar: 236px;
-    --spacing-topbar: 64px;
+    --spacing-sidebar: 250px;
+    --spacing-topbar: 68px;
 }
 
 @layer base {
@@ -68,6 +70,10 @@
         background-color: var(--color-canvas);
         color: var(--color-ink);
         -webkit-font-smoothing: antialiased;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.04) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.04) 0px, transparent 50%);
+        background-attachment: fixed;
     }
 
     :focus-visible {
@@ -76,175 +82,230 @@
     }
 }
 
-/* ---- chiffres alignés (montants, quantités) ---- */
-
+/* ---- Chiffres tabulaires alignés ---- */
 @utility num {
     font-family: var(--font-mono);
     font-feature-settings: 'tnum';
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
 }
 
-/* ---- surfaces ---- */
-
+/* ---- Panneaux & Cartes Modernes ---- */
 @utility panel {
-    @apply rounded-card border border-line bg-white;
+    @apply rounded-card border border-slate-200/80 bg-white shadow-[0_2px_12px_-3px_rgba(15,23,42,0.04)]
+           transition-all duration-200;
+}
+
+@utility panel-interactive {
+    @apply panel hover:border-emerald-300 hover:shadow-[0_8px_24px_-4px_rgba(16,185,129,0.12)] hover:-translate-y-0.5;
 }
 
 @utility panel-head {
-    @apply flex flex-wrap items-center justify-between gap-3 border-b border-hairline px-[18px] py-3.5;
+    @apply flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4;
 }
 
 @utility panel-title {
-    @apply text-sm font-bold;
+    @apply text-sm font-bold tracking-tight text-slate-800;
 }
 
-/* ---- boutons ---- */
-
+/* ---- Boutons Modernes ---- */
 @utility btn {
-    @apply inline-flex h-9 items-center justify-center gap-2 rounded-field px-4
-           text-[13px] font-semibold whitespace-nowrap transition-colors
-           disabled:pointer-events-none disabled:opacity-50;
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4
+           text-[13px] font-semibold whitespace-nowrap transition-all duration-200
+           active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
 }
 
 @utility btn-primary {
-    @apply btn bg-brand-500 text-white hover:bg-brand-600;
+    @apply btn bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-medium
+           shadow-sm shadow-emerald-600/25 hover:from-emerald-500 hover:to-teal-500 hover:shadow-md hover:shadow-emerald-600/35;
 }
 
 @utility btn-ghost {
-    @apply btn border border-line bg-white text-slate-ink hover:bg-surface;
+    @apply btn border border-slate-200/80 bg-white text-slate-700 shadow-sm
+           hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900;
 }
 
 @utility btn-danger {
-    @apply btn border border-danger-border bg-danger-bg text-danger-fg hover:bg-danger-border;
+    @apply btn border border-red-200 bg-red-50 text-red-600 hover:bg-red-100/80 hover:text-red-700;
 }
 
 @utility btn-lg {
-    @apply h-12 rounded-field px-5 text-[15px] font-bold;
+    @apply h-12 rounded-xl px-6 text-sm font-bold shadow-md;
 }
 
-/* Bouton carré à icône seule des tableaux. */
+/* Boutons icônes */
 @utility btn-icon {
-    @apply grid size-8 shrink-0 place-items-center rounded-lg border border-line
-           bg-white transition-colors hover:bg-surface;
+    @apply grid size-8.5 shrink-0 place-items-center rounded-xl border border-slate-200/80
+           bg-white text-slate-600 shadow-sm transition-all duration-150
+           hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 active:scale-95;
 }
 
 @utility btn-icon-danger {
-    @apply btn-icon border-danger-border bg-danger-bg hover:bg-danger-border;
+    @apply btn-icon border-red-200/80 bg-red-50/70 text-red-600 hover:border-red-300 hover:bg-red-100/80 hover:text-red-700;
 }
 
-/* ---- formulaires ---- */
-
+/* ---- Formulaires Élégants ---- */
 @utility field-label {
-    @apply mb-1.5 block text-[13px] font-semibold;
+    @apply mb-1.5 block text-xs font-semibold text-slate-700;
 }
 
 @utility field-input {
-    @apply block h-11 w-full rounded-field border border-line bg-surface px-3.5
-           text-sm text-ink placeholder:text-faint
-           focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/15;
+    @apply block h-10.5 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5
+           text-sm text-slate-900 placeholder:text-slate-400 shadow-inner/10
+           transition-all duration-150
+           focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/15;
 }
 
 @utility field-textarea {
-    @apply block w-full rounded-field border border-line bg-surface px-3.5 py-2.5
-           text-sm text-ink placeholder:text-faint
-           focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/15;
+    @apply block w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5
+           text-sm text-slate-900 placeholder:text-slate-400
+           transition-all duration-150
+           focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/15;
 }
 
 @utility field-error {
-    @apply mt-1.5 text-[13px] text-danger-fg;
+    @apply mt-1.5 text-xs font-medium text-red-600 flex items-center gap-1;
 }
 
-/* ---- tableaux ---- */
-
+/* ---- Tableaux de Données ---- */
 @utility table-data {
     @apply w-full border-collapse text-[13px];
 
     & thead tr {
-        @apply bg-[#F7FAF9] text-left text-muted;
+        @apply border-b border-slate-200/80 bg-slate-50/75 text-left text-xs font-semibold uppercase tracking-wider text-slate-500;
     }
 
     & thead th {
-        @apply px-3 py-3.5 font-semibold first:px-[18px];
+        @apply px-4 py-3.5 first:pl-5 last:pr-5;
     }
 
     & tbody tr {
-        @apply border-t border-hairline hover:bg-[#F2F9F6];
+        @apply border-b border-slate-100 transition-colors duration-150 hover:bg-emerald-50/30;
     }
 
     & tbody td {
-        @apply px-3 py-3.5 first:px-[18px];
+        @apply px-4 py-3.5 first:pl-5 last:pr-5 align-middle;
     }
 }
 
-/* ---- pastilles ---- */
-
+/* ---- Badges & Pastilles ---- */
 @utility pill {
-    @apply inline-flex items-center rounded-pill px-2.5 py-[3px] text-xs font-semibold;
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide;
 }
 
 @utility pill-ok {
-    @apply pill bg-success-bg text-success-fg;
+    @apply pill bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20;
 }
 
 @utility pill-warn {
-    @apply pill bg-warning-bg text-warning-text;
+    @apply pill bg-amber-50 text-amber-800 ring-1 ring-amber-600/20;
 }
 
 @utility pill-danger {
-    @apply pill bg-danger-bg text-danger-fg;
+    @apply pill bg-red-50 text-red-700 ring-1 ring-red-600/20;
 }
 
-/* Onglets de filtre de la liste des médicaments. */
+/* Onglets de filtrage */
 @utility filter-tab {
-    @apply rounded-pill border border-line bg-white px-3.5 py-1.5 text-[13px]
-           text-slate-ink transition-colors hover:bg-surface;
+    @apply rounded-xl border border-slate-200/80 bg-white px-3.5 py-1.5 text-xs font-medium
+           text-slate-600 shadow-sm transition-all duration-150 hover:border-slate-300 hover:text-slate-900;
 }
 
 @utility filter-tab-active {
-    @apply filter-tab border-brand-900 bg-brand-900 font-semibold text-white hover:bg-brand-900;
+    @apply filter-tab border-emerald-600 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold
+           shadow-md shadow-emerald-600/20 hover:border-emerald-600 hover:text-white;
 }
 
-/* ---- messages ---- */
-
+/* ---- Notifications Flash ---- */
 @utility notice {
-    @apply flex items-start gap-3 rounded-field border px-4 py-3 text-[13px];
+    @apply flex items-start gap-3 rounded-2xl border p-4 text-sm shadow-sm;
 }
 
 @utility notice-info {
-    @apply notice border-brand-50 bg-brand-50 text-brand-600;
+    @apply notice border-emerald-200 bg-emerald-50/80 text-emerald-800;
 }
 
 @utility notice-warn {
-    @apply notice border-warning-border bg-warning-bg text-warning-text;
+    @apply notice border-amber-200 bg-amber-50/80 text-amber-800;
 }
 
 @utility notice-error {
-    @apply notice border-danger-border bg-danger-bg text-danger-text;
+    @apply notice border-red-200 bg-red-50/80 text-red-800;
 }
 
-/* ---- navigation latérale ---- */
-
+/* ---- Barre Latérale Sombre Premium ---- */
 @utility nav-link {
-    @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-sidebar-text
-           transition-colors hover:bg-white/10;
+    @apply flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-300
+           transition-all duration-150 hover:bg-white/10 hover:text-white;
 }
 
 @utility nav-link-active {
-    @apply nav-link bg-leaf font-semibold text-white hover:bg-leaf;
+    @apply nav-link bg-gradient-to-r from-emerald-600 to-teal-600 font-semibold text-white
+           shadow-md shadow-emerald-950/40 hover:from-emerald-600 hover:to-teal-600;
 }
 
-/* ---- boîtes de dialogue natives ---- */
+@utility nav-dropdown-trigger {
+    @apply flex w-full cursor-pointer items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-300
+           transition-all duration-150 hover:bg-white/10 hover:text-white select-none list-none;
+}
+
+@utility nav-sub-link {
+    @apply flex items-center justify-between rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400
+           transition-all duration-150 hover:bg-white/5 hover:text-emerald-300;
+}
+
+@utility nav-sub-link-active {
+    @apply nav-sub-link bg-emerald-500/15 text-emerald-300 font-semibold shadow-xs;
+}
+
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+
+/* ---- Dialogues / Modals Natives ---- */
+dialog {
+    margin: auto !important;
+    position: fixed !important;
+    inset: 0 !important;
+    height: fit-content;
+}
+
+dialog:not([open]) {
+    display: none !important;
+}
+
+dialog[open] {
+    display: block;
+    margin: auto !important;
+    position: fixed !important;
+    inset: 0 !important;
+    height: fit-content;
+    animation: modal-enter 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modal-enter {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
 
 @utility dialog-panel {
-    @apply w-[min(30rem,calc(100vw-2rem))] rounded-card border border-line bg-white p-0 text-ink;
+    @apply fixed inset-0 m-auto w-[min(34rem,calc(100vw-2rem))] max-h-[calc(100vh-4rem)] overflow-y-auto rounded-3xl border border-slate-200/90 bg-white p-0 text-slate-900
+           shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] ring-1 ring-slate-900/10;
 }
 
 dialog::backdrop {
-    background-color: rgb(12 42 34 / 0.55);
+    background-color: rgb(15 23 42 / 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
-/* ---- ticket 80 mm ---- */
-
+/* ---- Format Ticket 80 mm ---- */
 .ticket {
     width: 80mm;
     max-width: 100%;
@@ -262,7 +323,6 @@ dialog::backdrop {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
     *,
     *::before,
     *::after {
@@ -271,8 +331,7 @@ dialog::backdrop {
     }
 }
 
-/* ---- impression : seul le ticket sort de l'imprimante ---- */
-
+/* Impression Ticket */
 @media print {
     @page {
         size: 80mm auto;
